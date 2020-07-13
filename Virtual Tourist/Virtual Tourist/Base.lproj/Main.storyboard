@@ -42,13 +42,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="L3T-85-g9w">
-                                <rect key="frame" x="0.0" y="73" width="414" height="128"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </mapView>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="qbL-1p-yVH">
-                                <rect key="frame" x="0.0" y="209" width="414" height="609"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="qbL-1p-yVH">
+                                <rect key="frame" x="0.0" y="256" width="414" height="557"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="vbe-6h-Tnn">
                                     <size key="itemSize" width="128" height="128"/>
@@ -67,21 +62,57 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bfK-PR-OcT">
-                                <rect key="frame" x="0.0" y="818" width="414" height="44"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bfK-PR-OcT">
+                                <rect key="frame" x="0.0" y="813" width="414" height="49"/>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="YGS-fo-kAz"/>
                                     <barButtonItem title="New Collection" id="Kz8-8K-cwj"/>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="5V3-th-JTK"/>
                                 </items>
                             </toolbar>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="L3T-85-g9w">
+                                <rect key="frame" x="0.0" y="88" width="414" height="160"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="160" id="Sds-95-Iee"/>
+                                </constraints>
+                            </mapView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="qbL-1p-yVH" firstAttribute="trailing" secondItem="ehV-8p-orQ" secondAttribute="trailing" id="4Sm-Rc-NCB"/>
+                            <constraint firstItem="bfK-PR-OcT" firstAttribute="trailing" secondItem="ehV-8p-orQ" secondAttribute="trailing" id="ACH-IW-q6g"/>
+                            <constraint firstItem="L3T-85-g9w" firstAttribute="trailing" secondItem="ehV-8p-orQ" secondAttribute="trailing" id="N4D-ML-5a2"/>
+                            <constraint firstItem="bfK-PR-OcT" firstAttribute="leading" secondItem="ehV-8p-orQ" secondAttribute="leading" id="Oyi-aO-5od"/>
+                            <constraint firstItem="L3T-85-g9w" firstAttribute="top" secondItem="ehV-8p-orQ" secondAttribute="top" id="S2Q-ur-3Ve"/>
+                            <constraint firstItem="bfK-PR-OcT" firstAttribute="top" secondItem="qbL-1p-yVH" secondAttribute="bottom" id="UDC-bM-uKO"/>
+                            <constraint firstItem="qbL-1p-yVH" firstAttribute="top" secondItem="L3T-85-g9w" secondAttribute="bottom" constant="8" id="WoE-ge-7Qg"/>
+                            <constraint firstItem="L3T-85-g9w" firstAttribute="leading" secondItem="ehV-8p-orQ" secondAttribute="leading" id="Xwe-7Y-zMh"/>
+                            <constraint firstItem="bfK-PR-OcT" firstAttribute="bottom" secondItem="ehV-8p-orQ" secondAttribute="bottom" id="gAy-hx-9hb"/>
+                            <constraint firstItem="qbL-1p-yVH" firstAttribute="leading" secondItem="ehV-8p-orQ" secondAttribute="leading" id="nUx-Zm-HYi"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="ehV-8p-orQ"/>
                     </view>
+                    <navigationItem key="navigationItem" id="2P9-a6-VXL"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vWQ-mz-Ws0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1855.072463768116" y="120.53571428571428"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="2Jc-eg-iDh">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="VrF-eh-dY7" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Hyy-1o-OP2">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="0Bf-Ql-63E" kind="relationship" relationship="rootViewController" id="uRw-KI-BhQ"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Fmf-1N-0V7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="944.92753623188412" y="120.53571428571428"/>
         </scene>
