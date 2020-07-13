@@ -92,7 +92,9 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ehV-8p-orQ"/>
                     </view>
-                    <navigationItem key="navigationItem" id="2P9-a6-VXL"/>
+                    <navigationItem key="navigationItem" id="2P9-a6-VXL">
+                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="N4D-H4-5xd"/>
+                    </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vWQ-mz-Ws0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
