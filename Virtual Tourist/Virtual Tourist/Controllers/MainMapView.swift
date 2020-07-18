@@ -61,5 +61,27 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
             annotations.append(annotation)
         }*/
     }
+    
+    //MARK: MapViewDelegate
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: self.annotationReuseId) as? MKPinAnnotationView
+
+        if pinView == nil {
+            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: self.annotationReuseId)
+            pinView!.canShowCallout = true
+            pinView!.pinTintColor = .blue
+            pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+        }
+        else {
+            pinView!.annotation = annotation
+        }
+        return pinView
+    }
+
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        if control == view.rightCalloutAccessoryView {
+            //TO DO: Perform Segue to Photo Collection View
+        }
+    }
 }
 
