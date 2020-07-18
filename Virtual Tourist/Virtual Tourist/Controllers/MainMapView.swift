@@ -1,0 +1,65 @@
+//
+//  MainMapView.swift
+//  Virtual Tourist
+//
+//  Created by Sarah Gunnels Porter on 7/13/20.
+//  Copyright © 2020 Gunnels Porter. All rights reserved.
+//
+
+import UIKit
+import CoreData
+import MapKit
+
+class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
+
+    //MARK: Outlets
+    @IBOutlet weak var mapView: MKMapView!
+    
+    //MARK: Data
+    var fetchedResultsController:NSFetchedResultsController<Pin>!
+    
+    //MARK: Variable definitions
+    let showCollectionSegueID = "ShowCollection"
+    var annotations = [MKPointAnnotation]()
+    let annotationReuseId = "pin"
+    
+    //MARK: viewDidLoad
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.mapView.delegate = self
+        self.setupFetchedResultsController()
+        self.convertPinsToAnnotations()
+        self.mapView.addAnnotations(self.annotations)
+    }
+
+    //MARK: Data Handling
+    fileprivate func setupFetchedResultsController() {
+        let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        //TO DO: Set-up Data Controller then load data
+        /*
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "pins")
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            fatalError("The fetch could not be performed: \(error.localizedDescription)")
+        }*/
+    }
+    
+    func convertPinsToAnnotations(){
+        //TO DO: Set-up Data Controller then convert loaded data to Annotations
+        /*for pin in pins {
+            let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+
+            // Create the annotation; setting coordiates, title, and subtitle properties
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = coordinate
+            annotation.title = pin.locationName ?? ""
+            
+            annotations.append(annotation)
+        }*/
+    }
+}
+
