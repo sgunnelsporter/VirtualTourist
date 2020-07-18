@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MainMapView.swift
 //  Virtual Tourist
 //
 //  Created by Sarah Gunnels Porter on 7/13/20.
@@ -7,9 +7,16 @@
 //
 
 import UIKit
+import MapKit
 
-class ViewController: UIViewController {
+class MainMapView: UIViewController {
 
+    //MARK: Outlets
+    
+    //MARK: Variable definitions
+    let showCollectionSegueID = "ShowCollection"
+    
+    //MARK: viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
