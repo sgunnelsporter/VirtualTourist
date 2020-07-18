@@ -16,6 +16,7 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     @IBOutlet weak var mapView: MKMapView!
     
     //MARK: Data
+    var dataController:DataController!
     var fetchedResultsController:NSFetchedResultsController<Pin>!
     
     //MARK: Variable definitions
@@ -38,14 +39,13 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
         let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
         //TO DO: Set-up Data Controller then load data
-        /*
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "pins")
         fetchedResultsController.delegate = self
         do {
             try fetchedResultsController.performFetch()
         } catch {
             fatalError("The fetch could not be performed: \(error.localizedDescription)")
-        }*/
+        }
     }
     
     func convertPinsToAnnotations(){
