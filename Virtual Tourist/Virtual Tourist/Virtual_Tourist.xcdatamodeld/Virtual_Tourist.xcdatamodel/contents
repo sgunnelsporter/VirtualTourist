@@ -6,11 +6,12 @@
     </entity>
     <entity name="Pin" representedClassName="Pin" syncable="YES" codeGenerationType="class">
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="location" optional="YES" attributeType="Transformable" customClassName="CLLocationCoordinate2D"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" customClassName="CLLocationCoordinate2D"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="photo" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Photo" inverseName="associatedPin" inverseEntity="Photo"/>
     </entity>
     <elements>
         <element name="Photo" positionX="175.7671508789062" positionY="-14.05499267578125" width="128" height="73"/>
-        <element name="Pin" positionX="-63" positionY="-18" width="128" height="74"/>
+        <element name="Pin" positionX="-63" positionY="-18" width="128" height="89"/>
     </elements>
 </model>
