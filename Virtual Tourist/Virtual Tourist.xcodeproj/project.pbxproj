@@ -60,8 +60,8 @@
 			children = (
 				2633A0B024BCB4EB00A99B8D /* AppDelegate.swift */,
 				2633A0B224BCB4EB00A99B8D /* SceneDelegate.swift */,
-				26DB07BD24C33DFC009CE6E8 /* Controllers */,
 				26DB07BE24C33E1E009CE6E8 /* Data Model */,
+				26DB07BD24C33DFC009CE6E8 /* Controllers */,
 				2633A0B624BCB4EB00A99B8D /* Main.storyboard */,
 				2633A0BE24BCB4EC00A99B8D /* LaunchScreen.storyboard */,
 				2633A0BC24BCB4EC00A99B8D /* Assets.xcassets */,

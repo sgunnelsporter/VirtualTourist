@@ -30,6 +30,7 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="mapView" destination="gMH-iQ-cse" id="BqF-IH-3D9"/>
                         <segue destination="VrF-eh-dY7" kind="presentation" identifier="ShowCollection" modalPresentationStyle="fullScreen" id="dWA-Vi-NIH"/>
                     </connections>
                 </viewController>
