@@ -21,7 +21,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     var fetchedResultsController:NSFetchedResultsController<Pin>!
     
     //MARK: Variable definitions
-    let showCollectionSegueID = "ShowCollection"
+    let showPhotoAlbumSegueID = "ShowCollection"
     var annotations = [MKPointAnnotation]()
     let annotationReuseId = "pin"
     
@@ -67,6 +67,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         let annotation = MKPointAnnotation()
         annotation.coordinate = coordinate
         annotation.title = pin.locationName ?? ""
+        annotation.subtitle = pin.id?.uuidString
         
         return annotation
     }
@@ -123,16 +124,17 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         if control == view.rightCalloutAccessoryView {
             // Perform Segue to Photo Collection View
-            performSegue(withIdentifier: self.showCollectionSegueID, sender: self)
+            performSegue(withIdentifier: self.showPhotoAlbumSegueID, sender: view.annotation?.subtitle as Any?)
         }
     }
     
     //MARK: Prepare for segue to collection view
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == self.showCollectionSegueID {
-            //TO DO: Send Pin id to Collection View
-           /* let controller = segue.destination as! PhotoAlbumView
-            let controller.pinId = pinId*/
+        if segue.identifier == self.showPhotoAlbumSegueID {
+            //Send Pin and View Context to Album View
+           let vc = segue.destination as! PhotoAlbumViewController
+            vc.pinId = sender as! String?
+            vc.dataContext = self.dataContext
         }
     }
     

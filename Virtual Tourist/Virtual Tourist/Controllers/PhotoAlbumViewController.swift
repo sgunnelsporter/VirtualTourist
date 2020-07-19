@@ -16,11 +16,17 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var photoCollectionView: UICollectionView!
     
+    //MARK: Data Handling
+    var dataContext:NSManagedObjectContext!
+    var pinId:String?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Assign self as delegate to mapView and collectionView
         self.mapView.delegate = self
         self.photoCollectionView.delegate = self
+        
+        // Load the Pin
     }
     
 
