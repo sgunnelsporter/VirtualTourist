@@ -42,7 +42,7 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
         let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
-        //TO DO: Set-up Data Controller then load data
+        //Load data
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "pins")
         fetchedResultsController.delegate = self
         do {
@@ -129,7 +129,7 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     func getPinLocationName(_ coordinate: CLLocationCoordinate2D) -> String {
         var locationName: String!
         let geoCoder = CLGeocoder()
-        //TO DO: Convert location coordinate to location name.
+        // Convert location coordinate to location name.
         geoCoder.reverseGeocodeLocation(CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)) { (places, error) in
             if error == nil{
                 if let place = places{
