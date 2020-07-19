@@ -123,9 +123,22 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     
     //MARK: Get Pin Location Name
     func getPinLocationName(_ coordinate: CLLocationCoordinate2D) -> String {
+        var locationName: String!
         let geoCoder = CLGeocoder()
         //TO DO: Convert location coordinate to location name.
-        return "Paris"
+        geoCoder.reverseGeocodeLocation(CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)) { (places, error) in
+            if error == nil{
+                if let place = places{
+                    // Get city & Country
+                    let city = place.first?.locality ?? ""
+                    let country = place.first?.country ?? ""
+                    locationName = "\(city), \(country)"
+                } else {
+                    //TO DO: Handle Error
+                }
+            }
+        }
+        return locationName
     }
 }
 
