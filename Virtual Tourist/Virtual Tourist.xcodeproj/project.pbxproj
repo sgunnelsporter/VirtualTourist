@@ -14,6 +14,7 @@
 		2633A0BB24BCB4EB00A99B8D /* Virtual_Tourist.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2633A0B924BCB4EB00A99B8D /* Virtual_Tourist.xcdatamodeld */; };
 		2633A0BD24BCB4EC00A99B8D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2633A0BC24BCB4EC00A99B8D /* Assets.xcassets */; };
 		2633A0C024BCB4EC00A99B8D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2633A0BE24BCB4EC00A99B8D /* LaunchScreen.storyboard */; };
+		264F311B24C4C829000B1AED /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264F311A24C4C829000B1AED /* PhotoAlbumViewController.swift */; };
 		26BC894724C3609E009642C8 /* Pin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26BC894624C3609E009642C8 /* Pin+Extensions.swift */; };
 		26BC894924C36109009642C8 /* Photo+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26BC894824C36109009642C8 /* Photo+Extensions.swift */; };
 /* End PBXBuildFile section */
@@ -28,6 +29,7 @@
 		2633A0BC24BCB4EC00A99B8D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2633A0BF24BCB4EC00A99B8D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2633A0C124BCB4EC00A99B8D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		264F311A24C4C829000B1AED /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
 		26BC894624C3609E009642C8 /* Pin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pin+Extensions.swift"; sourceTree = "<group>"; };
 		26BC894824C36109009642C8 /* Photo+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Photo+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -78,6 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				2633A0B424BCB4EB00A99B8D /* TravelLocationsMapView.swift */,
+				264F311A24C4C829000B1AED /* PhotoAlbumViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -164,6 +167,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2633A0BB24BCB4EB00A99B8D /* Virtual_Tourist.xcdatamodeld in Sources */,
+				264F311B24C4C829000B1AED /* PhotoAlbumViewController.swift in Sources */,
 				26BC894924C36109009642C8 /* Photo+Extensions.swift in Sources */,
 				2633A0B524BCB4EB00A99B8D /* TravelLocationsMapView.swift in Sources */,
 				2633A0B124BCB4EB00A99B8D /* AppDelegate.swift in Sources */,

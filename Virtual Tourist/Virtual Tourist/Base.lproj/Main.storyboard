@@ -48,10 +48,10 @@
             </objects>
             <point key="canvasLocation" x="137.68115942028987" y="121.875"/>
         </scene>
-        <!--View Controller-->
+        <!--Photo Album View Controller-->
         <scene sceneID="K31-Mk-PMT">
             <objects>
-                <viewController id="0Bf-Ql-63E" sceneMemberID="viewController">
+                <viewController id="0Bf-Ql-63E" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="3bW-g8-env">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -110,6 +110,8 @@
                         <barButtonItem key="rightBarButtonItem" systemItem="edit" id="N4D-H4-5xd"/>
                     </navigationItem>
                     <connections>
+                        <outlet property="mapView" destination="L3T-85-g9w" id="4vQ-d2-3Rp"/>
+                        <outlet property="photoCollectionView" destination="qbL-1p-yVH" id="W3Q-fv-08L"/>
                         <segue destination="ZDx-q3-vJL" kind="presentation" identifier="ShowImageDetail" id="c1b-IT-42P"/>
                     </connections>
                 </viewController>
