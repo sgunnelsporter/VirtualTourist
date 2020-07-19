@@ -12,7 +12,7 @@ import MapKit
 
 class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
 
-    //MARK: Outlets
+    //MARK: Outlets & View Variables
     @IBOutlet weak var mapView: MKMapView!
     
     //MARK: Data
@@ -61,16 +61,25 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
             annotations.append(annotation)
         }*/
     }
+    //MARK: Long Press Gesture Handling
+    @IBAction func addNewPin(_ gestureRecognizer: UILongPressGestureRecognizer){
+        if gestureRecognizer.state == .began {
+            
+            //TO DO: Add alert to confirm pin addition
+
+        }
+    }
     
     //MARK: MapViewDelegate
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        //get a pin view from use reuse queue
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: self.annotationReuseId) as? MKPinAnnotationView
 
+        //set pin view attributes (blue with no callout bubble, will go directly to segue when tapped
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: self.annotationReuseId)
-            pinView!.canShowCallout = true
+            pinView!.canShowCallout = false
             pinView!.pinTintColor = .blue
-            pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
         }
         else {
             pinView!.annotation = annotation
@@ -78,6 +87,7 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
         return pinView
     }
 
+    //TO DO: Look into changing this so it's not callout being tapped, but pin being tapped
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         if control == view.rightCalloutAccessoryView {
             //TO DO: Perform Segue to Photo Collection View
