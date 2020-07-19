@@ -10,10 +10,11 @@ import UIKit
 import CoreData
 import MapKit
 
-class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
+class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate, UIGestureRecognizerDelegate {
 
     //MARK: Outlets & View Variables
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet var longPressRecognizer: UILongPressGestureRecognizer!
     
     //MARK: Data
     var dataController:DataController!
@@ -29,6 +30,8 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     override func viewDidLoad() {
         super.viewDidLoad()
         self.mapView.delegate = self
+        self.longPressRecognizer.delegate = self
+        self.mapView.addGestureRecognizer(longPressRecognizer)
         self.setupFetchedResultsController()
         self.convertPinsToAnnotations()
         self.mapView.addAnnotations(self.annotations)
@@ -66,10 +69,11 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     @IBAction func addNewPin(_ gestureRecognizer: UILongPressGestureRecognizer){
         if gestureRecognizer.state == .began {
             //TO DO: Get map coordinates of long press
-            let coordinates = CLLocationCoordinate2D(latitude: 0, longitude: 0)
+            let location = self.longPressRecognizer.location(in: self.mapView)
+            let coordinate = self.mapView.convert(location, toCoordinateFrom: self.mapView)
             //TO DO: Add alert to confirm pin addition
             // get the location name from geo search
-            self.tempPin.locationName = self.getPinLocationName(coordinates)
+            self.tempPin.locationName = self.getPinLocationName(coordinate)
             // create alert including location name
             let alertVC = UIAlertController(title: "Add new pin for", message: self.tempPin.locationName, preferredStyle: .alert)
             alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: self.createNewPin))
@@ -118,7 +122,7 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     }
     
     //MARK: Get Pin Location Name
-    func getPinLocationName(_ coordinates: CLLocationCoordinate2D) -> String {
+    func getPinLocationName(_ coordinate: CLLocationCoordinate2D) -> String {
         let geoCoder = CLGeocoder()
         //TO DO: Convert location coordinate to location name.
         return "Paris"
