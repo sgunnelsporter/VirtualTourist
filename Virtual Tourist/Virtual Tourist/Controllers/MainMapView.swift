@@ -17,7 +17,7 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     @IBOutlet var longPressRecognizer: UILongPressGestureRecognizer!
     
     //MARK: Data
-    var dataController:DataController!
+    var dataContext:NSManagedObjectContext!
     var fetchedResultsController:NSFetchedResultsController<Pin>!
     
     //MARK: Variable definitions
@@ -30,6 +30,9 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     override func viewDidLoad() {
         super.viewDidLoad()
         self.mapView.delegate = self
+        // Set Data Context
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        self.dataContext = appDelegate?.persistentContainer.viewContext
         self.longPressRecognizer.delegate = self
         self.mapView.addGestureRecognizer(longPressRecognizer)
         self.setupFetchedResultsController()
@@ -40,10 +43,10 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     //MARK: Data Handling
     fileprivate func setupFetchedResultsController() {
         let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
+        let sortDescriptor = NSSortDescriptor(key: "id", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
         //Load data
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "pins")
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.dataContext, sectionNameKeyPath: nil, cacheName: "pins")
         fetchedResultsController.delegate = self
         do {
             try fetchedResultsController.performFetch()
@@ -89,12 +92,12 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     
     func createNewPin(coordinate: CLLocationCoordinate2D, name: String){
         //Create and save new pin to Core Data
-        let pin = Pin(context: dataController.viewContext)
+        let pin = Pin(context: dataContext)
         pin.latitude = coordinate.latitude
         pin.longitude = coordinate.longitude
         pin.locationName = name
         
-        try? dataController.viewContext.save()
+        try? dataContext.save()
     }
     
     //MARK: MapViewDelegate
