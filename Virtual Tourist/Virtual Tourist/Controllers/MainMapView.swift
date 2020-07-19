@@ -24,7 +24,6 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     let showCollectionSegueID = "ShowCollection"
     var annotations = [MKPointAnnotation]()
     let annotationReuseId = "pin"
-    var tempPin:Pin!
     
     //MARK: viewDidLoad
     override func viewDidLoad() {
@@ -77,12 +76,10 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
             //Get map coordinates of long press
             let location = self.longPressRecognizer.location(in: self.mapView)
             let coordinate = self.mapView.convert(location, toCoordinateFrom: self.mapView)
-            self.tempPin.latitude = coordinate.latitude
-            self.tempPin.longitude = coordinate.longitude
             // Get the location name from geo search
             let locationName = self.getPinLocationName(coordinate)
             // Create alert including location name
-            let alertVC = UIAlertController(title: "Add new pin for", message: self.tempPin.locationName, preferredStyle: .alert)
+            let alertVC = UIAlertController(title: "Add new pin for", message: locationName, preferredStyle: .alert)
             alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in self.createNewPin(coordinate: coordinate, name: locationName)}))
             alertVC.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             // display alert
@@ -90,14 +87,16 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
         }
     }
     
-    func createNewPin(coordinate: CLLocationCoordinate2D, name: String){
+    func createNewPin(coordinate: CLLocationCoordinate2D, name: String?){
         //Create and save new pin to Core Data
         let pin = Pin(context: dataContext)
         pin.latitude = coordinate.latitude
         pin.longitude = coordinate.longitude
-        pin.locationName = name
+        pin.locationName = name ?? ""
         
         try? dataContext.save()
+        
+        self.convertPinsToAnnotations()
     }
     
     //MARK: MapViewDelegate
@@ -135,7 +134,7 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     }
     
     //MARK: Get Pin Location Name
-    func getPinLocationName(_ coordinate: CLLocationCoordinate2D) -> String {
+    func getPinLocationName(_ coordinate: CLLocationCoordinate2D) -> String? {
         var locationName: String!
         let geoCoder = CLGeocoder()
         // Convert location coordinate to location name.
@@ -148,6 +147,7 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
                     locationName = "\(city), \(country)"
                 } else {
                     //TO DO: Handle Error
+                    locationName = "Something weird is happending"
                 }
             }
         }
