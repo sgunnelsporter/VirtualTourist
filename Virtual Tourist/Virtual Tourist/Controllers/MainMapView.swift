@@ -53,28 +53,32 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     }
     
     func convertPinsToAnnotations(){
-        //TO DO: Set-up Data Controller then convert loaded data to Annotations
-        /*for pin in pins {
-            let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+        // Convert Pins data to Annotations on Map
+        // Check if pins were loaded (or exist)
+        if let pins = fetchedResultsController.fetchedObjects {
+            for pin in pins {
+                let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
 
-            // Create the annotation; setting coordiates, title, and subtitle properties
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = coordinate
-            annotation.title = pin.locationName ?? ""
-            
-            annotations.append(annotation)
-        }*/
+                // Create the annotation; setting coordiates, title, and subtitle properties
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = coordinate
+                annotation.title = pin.locationName ?? ""
+                
+                annotations.append(annotation)
+            }
+        }
     }
     //MARK: Long Press Gesture Handling
     @IBAction func addNewPin(_ gestureRecognizer: UILongPressGestureRecognizer){
         if gestureRecognizer.state == .began {
-            //TO DO: Get map coordinates of long press
+            //Get map coordinates of long press
             let location = self.longPressRecognizer.location(in: self.mapView)
             let coordinate = self.mapView.convert(location, toCoordinateFrom: self.mapView)
-            //TO DO: Add alert to confirm pin addition
-            // get the location name from geo search
+            self.tempPin.latitude = coordinate.latitude
+            self.tempPin.longitude = coordinate.longitude
+            // Get the location name from geo search
             self.tempPin.locationName = self.getPinLocationName(coordinate)
-            // create alert including location name
+            // Create alert including location name
             let alertVC = UIAlertController(title: "Add new pin for", message: self.tempPin.locationName, preferredStyle: .alert)
             alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: self.createNewPin))
             alertVC.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -115,7 +119,7 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     //MARK: Prepare for segue to collection view
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == self.showCollectionSegueID {
-            //TO DO: Send Pin information to Collection View
+            //TO DO: Send Pin id to Collection View
            /* let controller = segue.destination as! PhotoAlbumView
             let controller.pinId = pinId*/
         }
