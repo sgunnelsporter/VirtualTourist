@@ -97,5 +97,14 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
             performSegue(withIdentifier: self.showCollectionSegueID, sender: self)
         }
     }
+    
+    //MARK: Prepare for segue to collection view
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == self.showCollectionSegueID {
+            //TO DO: Send Pin information to Collection View
+           /* let controller = segue.destination as! PhotoAlbumView
+            let controller.pinId = pinId*/
+        }
+    }
 }
 
