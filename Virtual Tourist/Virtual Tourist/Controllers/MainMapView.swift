@@ -66,7 +66,10 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
         if gestureRecognizer.state == .began {
             
             //TO DO: Add alert to confirm pin addition
-
+            // get the location name from geo search
+            // create alert including location name
+            // display alert
+            // create new pin
         }
     }
     
@@ -75,11 +78,12 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
         //get a pin view from use reuse queue
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: self.annotationReuseId) as? MKPinAnnotationView
 
-        //set pin view attributes (blue with no callout bubble, will go directly to segue when tapped
+        //set pin view attributes
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: self.annotationReuseId)
-            pinView!.canShowCallout = false
+            pinView!.canShowCallout = true
             pinView!.pinTintColor = .blue
+            pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
         }
         else {
             pinView!.annotation = annotation
@@ -87,10 +91,10 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
         return pinView
     }
 
-    //TO DO: Look into changing this so it's not callout being tapped, but pin being tapped
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         if control == view.rightCalloutAccessoryView {
-            //TO DO: Perform Segue to Photo Collection View
+            // Perform Segue to Photo Collection View
+            performSegue(withIdentifier: self.showCollectionSegueID, sender: self)
         }
     }
 }
