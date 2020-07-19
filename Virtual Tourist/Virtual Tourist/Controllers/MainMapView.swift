@@ -77,18 +77,24 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
             self.tempPin.latitude = coordinate.latitude
             self.tempPin.longitude = coordinate.longitude
             // Get the location name from geo search
-            self.tempPin.locationName = self.getPinLocationName(coordinate)
+            let locationName = self.getPinLocationName(coordinate)
             // Create alert including location name
             let alertVC = UIAlertController(title: "Add new pin for", message: self.tempPin.locationName, preferredStyle: .alert)
-            alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: self.createNewPin))
+            alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in self.createNewPin(coordinate: coordinate, name: locationName)}))
             alertVC.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             // display alert
             show(alertVC, sender: nil)
         }
     }
     
-    func createNewPin(alert: UIAlertAction!){
-        //TO DO: Create and save pin to Core Data
+    func createNewPin(coordinate: CLLocationCoordinate2D, name: String){
+        //Create and save new pin to Core Data
+        let pin = Pin(context: dataController.viewContext)
+        pin.latitude = coordinate.latitude
+        pin.longitude = coordinate.longitude
+        pin.locationName = name
+        
+        try? dataController.viewContext.save()
     }
     
     //MARK: MapViewDelegate
