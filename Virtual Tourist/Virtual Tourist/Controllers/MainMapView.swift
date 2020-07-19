@@ -35,7 +35,12 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
         self.longPressRecognizer.delegate = self
         self.mapView.addGestureRecognizer(longPressRecognizer)
         self.setupFetchedResultsController()
-        self.convertPinsToAnnotations()
+        // Check if pins were loaded (or exist)
+        if let pins = fetchedResultsController.fetchedObjects {
+            for pin in pins {
+                annotations.append(self.convertPinsToAnnotations(pin))
+            }
+        }
         self.mapView.addAnnotations(self.annotations)
     }
 
@@ -54,22 +59,18 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
         }
     }
     
-    func convertPinsToAnnotations(){
-        // Convert Pins data to Annotations on Map
-        // Check if pins were loaded (or exist)
-        if let pins = fetchedResultsController.fetchedObjects {
-            for pin in pins {
-                let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+    func convertPinsToAnnotations(_ pin: Pin) -> MKPointAnnotation{
+        // Convert Pins to Annotations for addition to map
+        let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
 
-                // Create the annotation; setting coordiates, title, and subtitle properties
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = coordinate
-                annotation.title = pin.locationName ?? ""
-                
-                annotations.append(annotation)
-            }
-        }
+        // Create the annotation; setting coordiates, title, and subtitle properties
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        annotation.title = pin.locationName ?? ""
+        
+        return annotation
     }
+    
     //MARK: Long Press Gesture Handling
     @IBAction func addNewPin(_ gestureRecognizer: UILongPressGestureRecognizer){
         if gestureRecognizer.state == .began {
@@ -94,9 +95,11 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
         pin.longitude = coordinate.longitude
         pin.locationName = name ?? ""
         
+        // Save new pin
         try? dataContext.save()
         
-        self.convertPinsToAnnotations()
+        // Add new annotation to map
+        self.mapView.addAnnotation(self.convertPinsToAnnotations(pin))
     }
     
     //MARK: MapViewDelegate
