@@ -23,6 +23,7 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     let showCollectionSegueID = "ShowCollection"
     var annotations = [MKPointAnnotation]()
     let annotationReuseId = "pin"
+    var tempPin:Pin!
     
     //MARK: viewDidLoad
     override func viewDidLoad() {
@@ -64,13 +65,22 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
     //MARK: Long Press Gesture Handling
     @IBAction func addNewPin(_ gestureRecognizer: UILongPressGestureRecognizer){
         if gestureRecognizer.state == .began {
-            
+            //TO DO: Get map coordinates of long press
+            let coordinates = CLLocationCoordinate2D(latitude: 0, longitude: 0)
             //TO DO: Add alert to confirm pin addition
             // get the location name from geo search
+            self.tempPin.locationName = self.getPinLocationName(coordinates)
             // create alert including location name
+            let alertVC = UIAlertController(title: "Add new pin for", message: self.tempPin.locationName, preferredStyle: .alert)
+            alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: self.createNewPin))
+            alertVC.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             // display alert
-            // create new pin
+            show(alertVC, sender: nil)
         }
+    }
+    
+    func createNewPin(alert: UIAlertAction!){
+        //TO DO: Create and save pin to Core Data
     }
     
     //MARK: MapViewDelegate
@@ -105,6 +115,13 @@ class MainMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControll
            /* let controller = segue.destination as! PhotoAlbumView
             let controller.pinId = pinId*/
         }
+    }
+    
+    //MARK: Get Pin Location Name
+    func getPinLocationName(_ coordinates: CLLocationCoordinate2D) -> String {
+        let geoCoder = CLGeocoder()
+        //TO DO: Convert location coordinate to location name.
+        return "Paris"
     }
 }
 
