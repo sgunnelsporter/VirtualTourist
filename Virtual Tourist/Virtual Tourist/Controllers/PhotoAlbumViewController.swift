@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import MapKit
 
-class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectionViewDelegate, NSFetchedResultsControllerDelegate {
+class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
 
     //MARK: View Outlets
     @IBOutlet weak var mapView: MKMapView!
@@ -22,11 +22,13 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     var fetchedPinResultsController:NSFetchedResultsController<Pin>!
     var fetchedPhotoResultsController:NSFetchedResultsController<Photo>!
     
+    //MARK: Other Variables
+    let photoAlbumCellReuseId = "PhotoAlbumCell"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Assign self as delegate to mapView and collectionView
         self.mapView.delegate = self
-        self.photoCollectionView.delegate = self
         
         // Load the Pin
         self.loadPhotoData()
@@ -77,15 +79,37 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         // save new photos to Core Data as they download in background queue
     }
     
-
     /*
-    // MARK: - Navigation
+        // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
+        // In a storyboard-based application, you will often want to do a little preparation before navigation
+        override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+            // Get the new view controller using segue.destination.
+            // Pass the selected object to the new view controller.
+        }
+        */
 
+    
+    //MARK: Collection View Set-up
+   override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.fetchedPhotoResultsController.fetchedObjects?.count ?? 0
+   }
+       
+   override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+           
+        let photo = self.fetchedPhotoResultsController.object(at: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: photoAlbumCellReuseId, for: indexPath) as! PhotoAlbumCell
+           // Set the image
+        cell.imageView?.image = UIImage(data: photo.imageData!)
+           
+        return cell
+   }
+       
+   override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath:IndexPath) {
+       //To Do: Segue on tap, unless in edit mode
+       //perform segue to detail view
+           
+   }
 }
+
+    
