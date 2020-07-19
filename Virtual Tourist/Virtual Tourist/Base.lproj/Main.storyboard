@@ -110,6 +110,8 @@
                         <barButtonItem key="rightBarButtonItem" systemItem="edit" id="N4D-H4-5xd"/>
                     </navigationItem>
                     <connections>
+                        <outlet property="mapView" destination="L3T-85-g9w" id="4vQ-d2-3Rp"/>
+                        <outlet property="photoCollectionView" destination="qbL-1p-yVH" id="W3Q-fv-08L"/>
                         <segue destination="ZDx-q3-vJL" kind="presentation" identifier="ShowImageDetail" id="c1b-IT-42P"/>
                     </connections>
                 </viewController>

@@ -7,13 +7,20 @@
 //
 
 import UIKit
+import CoreData
+import MapKit
 
-class PhotoAlbumViewController: UIViewController {
+class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectionViewDelegate {
 
+    //MARK: View Outlets
+    @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var photoCollectionView: UICollectionView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        // Assign self as delegate to mapView and collectionView
+        self.mapView.delegate = self
+        self.photoCollectionView.delegate = self
     }
     
 
