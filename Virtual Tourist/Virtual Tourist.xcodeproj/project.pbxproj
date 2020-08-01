@@ -19,6 +19,7 @@
 		26BC894724C3609E009642C8 /* Pin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26BC894624C3609E009642C8 /* Pin+Extensions.swift */; };
 		26BC894924C36109009642C8 /* Photo+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26BC894824C36109009642C8 /* Photo+Extensions.swift */; };
 		26D5BC7724D5B71E004F6537 /* FlickrAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26D5BC7624D5B71E004F6537 /* FlickrAPI.swift */; };
+		26D5BC7924D5CA3C004F6537 /* FlickrResponses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26D5BC7824D5CA3C004F6537 /* FlickrResponses.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		26BC894624C3609E009642C8 /* Pin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pin+Extensions.swift"; sourceTree = "<group>"; };
 		26BC894824C36109009642C8 /* Photo+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Photo+Extensions.swift"; sourceTree = "<group>"; };
 		26D5BC7624D5B71E004F6537 /* FlickrAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrAPI.swift; sourceTree = "<group>"; };
+		26D5BC7824D5CA3C004F6537 /* FlickrResponses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrResponses.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				26D5BC7624D5B71E004F6537 /* FlickrAPI.swift */,
+				26D5BC7824D5CA3C004F6537 /* FlickrResponses.swift */,
 			);
 			path = "Flikr API";
 			sourceTree = "<group>";
@@ -193,6 +196,7 @@
 				264F311E24C4D8DA000B1AED /* PhotoAlbumCell.swift in Sources */,
 				26D5BC7724D5B71E004F6537 /* FlickrAPI.swift in Sources */,
 				26BC894924C36109009642C8 /* Photo+Extensions.swift in Sources */,
+				26D5BC7924D5CA3C004F6537 /* FlickrResponses.swift in Sources */,
 				2633A0B524BCB4EB00A99B8D /* TravelLocationsMapView.swift in Sources */,
 				2633A0B124BCB4EB00A99B8D /* AppDelegate.swift in Sources */,
 				2633A0B324BCB4EB00A99B8D /* SceneDelegate.swift in Sources */,

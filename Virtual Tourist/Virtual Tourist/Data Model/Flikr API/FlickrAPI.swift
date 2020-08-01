@@ -22,4 +22,32 @@ class FlickrAPI {
         let fullURL = Endpoint.baseURL.rawValue + "&lat=\(lat)&lon=\(lon)&page=\(page)"
         return URL(string: fullURL)
     }
+    
+    func getPhotosForLocation(lat:Double, lon: Double, completion: @escaping ([PhotoInfo], Error?) -> Void) {
+        //TO DO: Add random number generator to page.
+        let page = 4;
+        let url = self.locationSearchURL(lat: lat, lon: lon, page: page)
+        let urlRequest = URLRequest(url: url!)
+        let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    completion([], error)
+                }
+                return
+            }
+            let decoder = JSONDecoder()
+            do {
+                let fullResponseObject = try decoder.decode(PhotoSearchResponse.self, from: data)
+                let responseArray = fullResponseObject.photos
+                DispatchQueue.main.async {
+                    completion(responseArray, nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion([], error)
+                }
+            }
+        }
+        task.resume()
+    }
 }
