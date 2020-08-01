@@ -44,6 +44,11 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
         flowLayout.itemSize = CGSize(width: wDimension, height: hDimension)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.photoCollectionView.reloadData()
+    }
+    
     //MARK: Load the Pin & Photo Data
     func loadPhotoData(){
         // get get Pin with pinId given by MapView
