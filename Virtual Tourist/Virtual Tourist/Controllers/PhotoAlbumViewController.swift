@@ -42,6 +42,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMa
         flowLayout.minimumInteritemSpacing = space
         flowLayout.minimumLineSpacing = space
         flowLayout.itemSize = CGSize(width: wDimension, height: hDimension)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {

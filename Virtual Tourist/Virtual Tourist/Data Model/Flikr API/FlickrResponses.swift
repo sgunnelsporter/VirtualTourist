@@ -30,25 +30,163 @@ struct PhotoInfo: Codable {
     let isfamily: Bool
 }
 
-class PhotoInformation : NSObject, XMLParserDelegate {
-   var level:Int = 0
-   func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-    print("startElement: \(elementName),  Level:  \(level)");
-      level = level+1
-   }
-   func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-    level = level-1
-    print("startElement: \(elementName),  Level:  \(level)");
-      }
-   func parser(_ parser: XMLParser, foundCharacters string: String) {
-      let trimmedString = string.trimmingCharacters(in: .whitespacesAndNewlines)
-      if trimmedString.count > 0
-      {
-        print(" Value: \(string)");
-      }
-   }
+protocol ParserDelegate : XMLParserDelegate {
+    var delegateStack: ParserDelegateStack? { get set }
+    func didBecomeActive()
+}
 
-   func parser(_ parser: XMLParser, parseErrorOccurred parseError: Error) {
-    print("failure error: \(parseError)")
-   }
+extension ParserDelegate {
+    func didBecomeActive() {
+    }
+}
+
+protocol NodeParser : ParserDelegate {
+    associatedtype Item
+    var result: Item? { get }
+}
+
+class ParserDelegateStack {
+    private var parsers: [ParserDelegate] = []
+    private let xmlParser: XMLParser
+
+    init(xmlParser: XMLParser) {
+        self.xmlParser = xmlParser
+    }
+
+    func push(_ parser: ParserDelegate) {
+        parser.delegateStack = self
+        xmlParser.delegate = parser
+        parsers.append(parser)
+    }
+
+    func pop() {
+        parsers.removeLast()
+        if let next = parsers.last {
+            xmlParser.delegate = next
+            next.didBecomeActive()
+        } else {
+            xmlParser.delegate = nil
+        }
+    }
+}
+
+class ArrayParser<Parser : NodeParser> : NSObject, NodeParser {
+    var result: [Parser.Item]? = []
+    var delegateStack: ParserDelegateStack?
+
+    private let tagName: String
+    private let parserBuilder: (String) -> Parser?
+    private var currentParser: Parser?
+
+    init(tagName: String, parserBuilder: @escaping (String) -> Parser?) {
+        self.tagName = tagName
+        self.parserBuilder = parserBuilder
+    }
+
+    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
+        if elementName == tagName {
+            return
+        }
+
+        if let itemParser = parserBuilder(elementName) {
+            currentParser = itemParser
+            delegateStack?.push(itemParser)
+            itemParser.parser?(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
+        }
+    }
+
+    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+        if elementName == tagName {
+            delegateStack?.pop()
+        }
+    }
+
+    func didBecomeActive() {
+        guard let item = currentParser?.result else { return }
+        result?.append(item)
+    }
+}
+
+class PhotoInfoParser : NSObject, NodeParser {
+    private let tagName: String
+    private var id: String!
+    private var owner: String!
+    private var secret: String!
+    private var server: Int!
+    private var farm: Int!
+    private var title: String!
+    
+
+    var delegateStack: ParserDelegateStack?
+    var result: PhotoInfo?
+
+    init(tagName: String) {
+        self.tagName = tagName
+    }
+
+    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
+        if elementName == tagName {
+            id = attributeDict["id"]
+            owner = attributeDict["owner"]
+            secret = attributeDict["secret"]
+            server = attributeDict["server"].flatMap(Int.init)
+            farm = attributeDict["farm"].flatMap(Int.init)
+            title = attributeDict["title"]
+        }
+    }
+
+    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+        if elementName == tagName {
+            result = PhotoInfo(id: id, owner: owner, secret: secret, server: server, farm: farm, title: title, ispublic: true, isfriend: false, isfamily: false)
+            delegateStack?.pop()
+        }
+    }
+}
+
+class PhotoListParser : NSObject, NodeParser {
+    private let tagName: String
+
+    private var page: Int!
+    private var pages: Int!
+    private var perpage: Int!
+    private var total: Int!
+    private let photosParser: ArrayParser<PhotoInfoParser>
+
+    var delegateStack: ParserDelegateStack?
+    var result: PhotoSearchResponse?
+
+    init(tagName: String) {
+        self.tagName = tagName
+        photosParser = ArrayParser<PhotoInfoParser>(tagName: "photos") { tag in
+            guard tag == "photo" else { return nil }
+            return PhotoInfoParser(tagName: tag)
+        }
+    }
+
+    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
+        print("parsing \(elementName)")
+
+        if elementName == tagName {
+            page = attributeDict["page"].flatMap(Int.init)
+            pages = attributeDict["pages"].flatMap(Int.init)
+            perpage = attributeDict["perpage"].flatMap(Int.init)
+            total = attributeDict["total"].flatMap(Int.init)
+            return
+        }
+
+        switch elementName {
+        case "photo":
+            delegateStack?.push(photosParser)
+            photosParser.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
+
+        default: break
+        }
+    }
+
+    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+        if elementName == tagName {
+            result = PhotoSearchResponse(page: page, pages: pages, perpage: perpage, total: total, photos: photosParser.result!)
+            delegateStack?.pop()
+        }
+    }
 }
