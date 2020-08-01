@@ -50,4 +50,12 @@ class FlickrAPI {
         }
         task.resume()
     }
+    
+    func imageURL(farm: Int, server: Int, id: String, secret: String) -> URL {
+        // https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
+        let urlString = "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
+        let url = URL(string: urlString)!
+        
+        return url
+    }
 }
