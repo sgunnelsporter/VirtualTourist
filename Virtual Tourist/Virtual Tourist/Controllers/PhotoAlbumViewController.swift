@@ -29,6 +29,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMa
         super.viewDidLoad()
         // Assign self as delegate to mapView and collectionView
         self.mapView.delegate = self
+        //TO DO: Add pin to the Map
         
         // Load the Pin
         self.loadPhotoData()

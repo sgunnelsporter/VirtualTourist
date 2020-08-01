@@ -35,6 +35,7 @@ class FlickrAPI {
                 }
                 return
             }
+            print(String(data: data, encoding: .utf8)!)
             let decoder = JSONDecoder()
             do {
                 let fullResponseObject = try decoder.decode(PhotoSearchResponse.self, from: data)
