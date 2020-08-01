@@ -145,6 +145,7 @@ class PhotoInfoParser : NSObject, NodeParser {
 
 class ResponseParser : NSObject, NodeParser {
     private let tagName: String
+    private let endTag = "rsp"
 
     private var page: Int!
     private var pages: Int!
@@ -163,6 +164,7 @@ class ResponseParser : NSObject, NodeParser {
         }
     }
 
+    // Start parsing the response
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
         print("parsing \(elementName)")
 
@@ -174,6 +176,7 @@ class ResponseParser : NSObject, NodeParser {
             return
         }
 
+        // parse each photo
         switch elementName {
         case "photo":
             delegateStack?.push(photosParser)
@@ -183,8 +186,9 @@ class ResponseParser : NSObject, NodeParser {
         }
     }
 
+    // Finish up when hitting end of Response
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        if elementName == tagName {
+        if elementName == endTag {
             result = PhotoSearchResponse(page: page, pages: pages, perpage: perpage, total: total, photos: photosParser.result!)
             delegateStack?.pop()
         }
