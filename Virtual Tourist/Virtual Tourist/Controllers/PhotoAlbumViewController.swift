@@ -15,6 +15,7 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
     //MARK: View Outlets
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var photoCollectionView: UICollectionView!
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
     //MARK: Data Handling
     var dataContext:NSManagedObjectContext!
@@ -32,6 +33,15 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
         
         // Load the Pin
         self.loadPhotoData()
+        
+        // Set-up Flow Layout of collection view
+        let space : CGFloat = 8.0
+        let wDimension = (view.frame.size.width - (2 * space)) / 3.0
+        let hDimension = (view.frame.size.height - (2 * space)) / 4.0
+
+        flowLayout.minimumInteritemSpacing = space
+        flowLayout.minimumLineSpacing = space
+        flowLayout.itemSize = CGSize(width: wDimension, height: hDimension)
     }
     
     //MARK: Load the Pin & Photo Data
