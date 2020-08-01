@@ -78,11 +78,7 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
             fatalError("The fetch could not be performed: \(error.localizedDescription)")
         }
         // check if photos exist for this pin
-        if let photos = fetchedPhotoResultsController.fetchedObjects {
-            for photo in photos {
-                // set photos in the collection view
-            }
-        } else {
+        if fetchedPhotoResultsController.fetchedObjects!.isEmpty {
             self.downloadPhotosFromFlickr()
         }
     }
@@ -111,7 +107,6 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
    }
        
    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-           
         let photo = self.fetchedPhotoResultsController.object(at: indexPath)
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: photoAlbumCellReuseId, for: indexPath) as! PhotoAlbumCell
            // Set the image
