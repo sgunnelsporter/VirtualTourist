@@ -40,14 +40,14 @@ class FlickrAPI {
             let xmlParser = XMLParser(data: data)
             let delegateStack = ParserDelegateStack(xmlParser: xmlParser)
 
-            let photoInfoParser = PhotoListParser(tagName: "photos")
-            delegateStack.push(photoInfoParser)
+            let responseParser = PhotoListParser(tagName: "photos")
+            delegateStack.push(responseParser)
 
             if xmlParser.parse() {
                 print("Done parsing")
-                print(photoInfoParser.result!)
+                print(responseParser.result!.total)
                 DispatchQueue.main.async {
-                    completion(photoInfoParser.result!.photos, nil)
+                    completion(responseParser.result!.photos, nil)
                 }
             } else {
                 print("Invalid xml", xmlParser.parserError?.localizedDescription ?? "")
