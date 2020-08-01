@@ -37,14 +37,20 @@ class FlickrAPI {
             }
             print(String(data: data, encoding: .utf8)!)
             // TO DO: Change to XML Parser!
-            let decoder = JSONDecoder()
-            do {
-                let fullResponseObject = try decoder.decode(PhotoSearchResponse.self, from: data)
-                let responseArray = fullResponseObject.photos
+            let xmlParser = XMLParser(data: data)
+            let delegateStack = ParserDelegateStack(xmlParser: xmlParser)
+
+            let photoInfoParser = PhotoListParser(tagName: "photos")
+            delegateStack.push(photoInfoParser)
+
+            if xmlParser.parse() {
+                print("Done parsing")
+                print(photoInfoParser.result!)
                 DispatchQueue.main.async {
-                    completion(responseArray, nil)
+                    completion(photoInfoParser.result!.photos, nil)
                 }
-            } catch {
+            } else {
+                print("Invalid xml", xmlParser.parserError?.localizedDescription ?? "")
                 DispatchQueue.main.async {
                     completion([], error)
                 }
