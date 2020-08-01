@@ -17,13 +17,13 @@ class FlickrAPI {
         }
     }
     
-    func locationSearchURL(lat: Double, lon: Double, page: Int) -> URL? {
+    class func locationSearchURL(lat: Double, lon: Double, page: Int) -> URL? {
         // example URL for each with lat/lon : https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=cf5e26ab866d8f7e61b97552cf489baa&lat=48.856&lon=2.353&radius=2&radius_units=miles&per_page=50&page=1
         let fullURL = Endpoint.baseURL.rawValue + "&lat=\(lat)&lon=\(lon)&page=\(page)"
         return URL(string: fullURL)
     }
     
-    func getPhotosForLocation(lat:Double, lon: Double, completion: @escaping ([PhotoInfo], Error?) -> Void) {
+    class func getPhotosForLocation(lat:Double, lon: Double, completion: @escaping ([PhotoInfo], Error?) -> Void) {
         //TO DO: Add random number generator to page.
         let page = 4;
         let url = self.locationSearchURL(lat: lat, lon: lon, page: page)
@@ -51,7 +51,7 @@ class FlickrAPI {
         task.resume()
     }
     
-    func imageURL(farm: Int, server: Int, id: String, secret: String) -> URL {
+    class func imageURL(farm: Int, server: Int, id: String, secret: String) -> URL {
         // https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
         let urlString = "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
         let url = URL(string: urlString)!

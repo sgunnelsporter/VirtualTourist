@@ -19,8 +19,7 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
     
     //MARK: Data Handling
     var dataContext:NSManagedObjectContext!
-    var pinId:String!
-    var fetchedPinResultsController:NSFetchedResultsController<Pin>!
+    var pin:Pin!
     var fetchedPhotoResultsController:NSFetchedResultsController<Photo>!
     
     //MARK: Other Variables
@@ -51,24 +50,9 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
     
     //MARK: Load the Pin & Photo Data
     func loadPhotoData(){
-        // get get Pin with pinId given by MapView
-        let pinFetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
-        let pinPredicate = NSPredicate(format: "id == %@", UUID(uuidString: pinId)! as CVarArg)
-        pinFetchRequest.predicate = pinPredicate
-        let sortDescriptor = NSSortDescriptor(key: "id", ascending: true)
-        pinFetchRequest.sortDescriptors = [sortDescriptor]
-        
-        fetchedPinResultsController = NSFetchedResultsController(fetchRequest: pinFetchRequest, managedObjectContext: dataContext, sectionNameKeyPath: nil, cacheName: nil)
-        fetchedPinResultsController.delegate = self
-
-        do {
-            try fetchedPinResultsController.performFetch()
-        } catch {
-            fatalError("The fetch could not be performed: \(error.localizedDescription)")
-        }
         // make fetch request for the photos for this Pin
         let photoFetchRequest:NSFetchRequest<Photo> = Photo.fetchRequest()
-        let photoPredicate = NSPredicate(format: "pin == %@", fetchedPinResultsController.fetchedObjects!.first!)
+        let photoPredicate = NSPredicate(format: "pin == %@", pin)
         photoFetchRequest.predicate = photoPredicate
         fetchedPhotoResultsController = NSFetchedResultsController(fetchRequest: photoFetchRequest, managedObjectContext: dataContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedPhotoResultsController.delegate = self
@@ -79,15 +63,36 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
         }
         // check if photos exist for this pin
         if fetchedPhotoResultsController.fetchedObjects!.isEmpty {
-            self.downloadPhotosFromFlickr()
+            self.downloadPhotoInformationFromFlickr()
         }
     }
     
-    func downloadPhotosFromFlickr(){
+    func downloadPhotoInformationFromFlickr(){
         //To Do: Download photos from Flickr
-        // download new set of photos for this pin from Flickr in background queue
-        // display in view in main queue as they download
-        // save new photos to Core Data as they download in background queue
+        // request photo information
+        FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: downloadPhotosFromFlickr(_:error:))
+    }
+    
+    func downloadPhotosFromFlickr(_ photoInfo: [PhotoInfo], error: Error?){
+        // download each photo
+        for photo in photoInfo {
+            // save new image
+            let imageURL = FlickrAPI.imageURL(farm: photo.farm, server: photo.server, id: photo.id, secret: photo.secret)
+            let newPhoto = Photo(context: dataContext)
+            newPhoto.associatedPin = pin
+            newPhoto.id = UUID()
+            // TO DO: Handle throw
+            // TO DO: Move to background queue
+            newPhoto.imageData = try! Data(contentsOf: imageURL)
+            // save new photos to Core Data as they download in background queue
+            newPhoto.awakeFromInsert()
+            
+            //TO Do: Handle Throw
+            try? dataContext.save()
+            
+            collectionView.reloadData()
+        }
+        
     }
     
     /*

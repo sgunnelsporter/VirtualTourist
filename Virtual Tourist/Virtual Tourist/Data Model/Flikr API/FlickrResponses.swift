@@ -18,11 +18,12 @@ struct PhotoSearchResponse: Codable {
 }
 
 struct PhotoInfo: Codable {
-    //photo id="2636" owner="47058503995@N01" secret="a123456" server="2" title="test_04" ispublic="1" isfriend="0" isfamily="0"
+    //<photo id="16112774426" owner="26932764@N03" secret="73cf8749e2" server="8616" farm="9" title="Le Châtelet-en-Brie (77)" ispublic="1" isfriend="0" isfamily="0" />
     let id: String
     let owner: String
     let secret: String
     let server: Int
+    let farm: Int
     let title: String
     let ispublic: Bool
     let isfriend: Bool

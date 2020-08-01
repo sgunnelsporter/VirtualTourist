@@ -66,10 +66,27 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         // Create the annotation; setting coordiates, title, and subtitle properties
         let annotation = MKPointAnnotation()
         annotation.coordinate = coordinate
-        annotation.title = pin.locationName ?? ""
+        annotation.title = pin.locationName ?? "Still Empty"
         annotation.subtitle = pin.id?.uuidString
         
         return annotation
+    }
+    
+    func convertAnnotationToPin(_ annotation: MKAnnotationView) -> Pin {
+        // TO DO:
+        let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "id", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        let predicate = NSPredicate(format: "id == %@", (annotation.annotation?.subtitle)!!)
+        fetchRequest.predicate = predicate
+        let tempFetchedResultsController:NSFetchedResultsController<Pin>!
+        tempFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.dataContext, sectionNameKeyPath: nil, cacheName: "passPin")
+        do {
+            try tempFetchedResultsController.performFetch()
+        } catch {
+            fatalError("The fetch could not be performed: \(error.localizedDescription)")
+        }
+        return (tempFetchedResultsController.fetchedObjects?.first)!
     }
     
     //MARK: Long Press Gesture Handling
@@ -94,7 +111,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         let pin = Pin(context: dataContext)
         pin.latitude = coordinate.latitude
         pin.longitude = coordinate.longitude
-        pin.locationName = name ?? ""
+        pin.locationName = name ?? "Empty"
         
         // Save new pin
         try? dataContext.save()
@@ -112,7 +129,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: self.annotationReuseId)
             pinView!.canShowCallout = true
-            pinView!.pinTintColor = .blue
+            pinView!.pinTintColor = .red
             pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
         }
         else {
@@ -124,7 +141,9 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         if control == view.rightCalloutAccessoryView {
             // Perform Segue to Photo Collection View
-            performSegue(withIdentifier: self.showPhotoAlbumSegueID, sender: view.annotation?.subtitle as Any?)
+            // translate annotation to pin
+            let pinToPass = self.convertAnnotationToPin(view)
+            performSegue(withIdentifier: self.showPhotoAlbumSegueID, sender: pinToPass as Any?)
         }
     }
     
@@ -133,7 +152,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         if segue.identifier == self.showPhotoAlbumSegueID {
             //Send Pin and View Context to Album View
            let vc = segue.destination as! PhotoAlbumViewController
-            vc.pinId = sender as! String?
+            vc.pin = sender as! Pin?
             vc.dataContext = self.dataContext
         }
     }
