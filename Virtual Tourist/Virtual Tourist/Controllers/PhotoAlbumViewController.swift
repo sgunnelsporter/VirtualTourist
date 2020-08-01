@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import MapKit
 
-class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
+class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
 
     //MARK: View Outlets
     @IBOutlet weak var mapView: MKMapView!
@@ -52,7 +52,9 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
     func loadPhotoData(){
         // make fetch request for the photos for this Pin
         let photoFetchRequest:NSFetchRequest<Photo> = Photo.fetchRequest()
-        let photoPredicate = NSPredicate(format: "pin == %@", pin)
+        let sortDescriptor = NSSortDescriptor(key: "id", ascending: false)
+        photoFetchRequest.sortDescriptors = [sortDescriptor]
+        let photoPredicate = NSPredicate(format: "associatedPin == %@", pin)
         photoFetchRequest.predicate = photoPredicate
         fetchedPhotoResultsController = NSFetchedResultsController(fetchRequest: photoFetchRequest, managedObjectContext: dataContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedPhotoResultsController.delegate = self
@@ -90,7 +92,7 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
             //TO Do: Handle Throw
             try? dataContext.save()
             
-            collectionView.reloadData()
+            photoCollectionView.reloadData()
         }
         
     }
@@ -107,11 +109,11 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
 
     
     //MARK: Collection View Set-up
-   override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.fetchedPhotoResultsController.fetchedObjects?.count ?? 0
    }
        
-   override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    private func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let photo = self.fetchedPhotoResultsController.object(at: indexPath)
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: photoAlbumCellReuseId, for: indexPath) as! PhotoAlbumCell
            // Set the image
@@ -120,7 +122,7 @@ class PhotoAlbumViewController: UICollectionViewController, MKMapViewDelegate, N
         return cell
    }
        
-   override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath:IndexPath) {
+   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath:IndexPath) {
        //To Do: Segue on tap, unless in edit mode
        //perform segue to detail view
            
