@@ -143,7 +143,7 @@ class PhotoInfoParser : NSObject, NodeParser {
     }
 }
 
-class PhotoListParser : NSObject, NodeParser {
+class ResponseParser : NSObject, NodeParser {
     private let tagName: String
 
     private var page: Int!

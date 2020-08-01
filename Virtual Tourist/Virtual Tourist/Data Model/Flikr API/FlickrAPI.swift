@@ -40,7 +40,7 @@ class FlickrAPI {
             let xmlParser = XMLParser(data: data)
             let delegateStack = ParserDelegateStack(xmlParser: xmlParser)
 
-            let responseParser = PhotoListParser(tagName: "photos")
+            let responseParser = ResponseParser(tagName: "photos")
             delegateStack.push(responseParser)
 
             if xmlParser.parse() {
