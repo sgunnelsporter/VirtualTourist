@@ -195,7 +195,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
             newPhoto.id = UUID()
             // TO DO: Handle throw
             // TO DO: Move to background queue
-            newPhoto.imageData = try! Data(contentsOf: imageURL)
+            newPhoto.imageData = try? Data(contentsOf: imageURL)
             // save new photos to Core Data as they download in background queue
             newPhoto.awakeFromInsert()
             
