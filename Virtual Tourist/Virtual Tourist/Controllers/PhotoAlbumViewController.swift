@@ -22,6 +22,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMa
     var pin:Pin!
     var fetchedPhotoResultsController:NSFetchedResultsController<Photo>!
     
+    var annotation = [MKPointAnnotation]()
+    
     //MARK: Other Variables
     let photoAlbumCellReuseId = "PhotoAlbumCell"
     
@@ -29,7 +31,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMa
         super.viewDidLoad()
         // Assign self as delegate to mapView and collectionView
         self.mapView.delegate = self
-        //TO DO: Add pin to the Map
+        //Add pin to the Map
+        annotation.append(self.setPinToAnnotation(pin))
+        self.mapView.addAnnotations(self.annotation)
         
         // Load the Pin
         self.loadPhotoData()
@@ -50,7 +54,21 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMa
         self.photoCollectionView.reloadData()
     }
     
-    //MARK: Load the Pin & Photo Data
+    //MARK: Set Pin and Pin Data
+    func setPinToAnnotation(_ pin: Pin) -> MKPointAnnotation{
+        // Convert Pins to Annotations for addition to map
+        let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+
+        // Create the annotation; setting coordiates, title, and subtitle properties
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        annotation.title = pin.locationName ?? "Still Empty"
+        annotation.subtitle = pin.id?.uuidString
+        
+        return annotation
+    }
+    
+    //MARK: Load the Photo Data
     func loadPhotoData(){
         // make fetch request for the photos for this Pin
         let photoFetchRequest:NSFetchRequest<Photo> = Photo.fetchRequest()
