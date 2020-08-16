@@ -177,9 +177,12 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             fatalError("The old image deletes could not be performed: \(error.localizedDescription)")
         }
         
+        // Full delete of savedImages
+        self.savedImages = []
+        photoCollectionView.reloadData()
+
         // Download New Set of Photos
         self.downloadPhotoInformationFromFlickr()
-        photoCollectionView.reloadData()
     }
     
     //MARK: Collection View Set-up
