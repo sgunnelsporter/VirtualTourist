@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Mcv-kc-c8A">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
@@ -8,7 +8,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Travel Locations Map View-->
+        <!--Virtual Tourist-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="TravelLocationsMapView" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
@@ -33,10 +33,11 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <navigationItem key="navigationItem" title="Virtual Tourist" id="FDp-D8-IGp"/>
                     <connections>
                         <outlet property="longPressRecognizer" destination="vq7-Tb-FII" id="c7u-aE-uWC"/>
                         <outlet property="mapView" destination="gMH-iQ-cse" id="BqF-IH-3D9"/>
-                        <segue destination="VrF-eh-dY7" kind="presentation" identifier="ShowCollection" modalPresentationStyle="fullScreen" id="dWA-Vi-NIH"/>
+                        <segue destination="0Bf-Ql-63E" kind="show" identifier="ShowCollection" id="2HL-Al-QOw"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -46,9 +47,9 @@
                     </connections>
                 </pongPressGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="137.68115942028987" y="121.875"/>
+            <point key="canvasLocation" x="1047.8260869565217" y="121.875"/>
         </scene>
-        <!--Photo Album View Controller-->
+        <!--Photo Album-->
         <scene sceneID="K31-Mk-PMT">
             <objects>
                 <viewController id="0Bf-Ql-63E" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
@@ -66,13 +67,16 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="CollectionCell" id="RJw-7p-kNO">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="PhotoAlbumCell" id="RJw-7p-kNO" customClass="PhotoAlbumCell" customModule="Virtual_Tourist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="909-g2-47E">
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="909-g2-47E" customClass="UIImageView">
                                             <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="imageView" destination="909-g2-47E" id="UW7-KG-7VV"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
@@ -106,10 +110,11 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ehV-8p-orQ"/>
                     </view>
-                    <navigationItem key="navigationItem" id="2P9-a6-VXL">
+                    <navigationItem key="navigationItem" title="Photo Album" id="2P9-a6-VXL">
                         <barButtonItem key="rightBarButtonItem" systemItem="edit" id="N4D-H4-5xd"/>
                     </navigationItem>
                     <connections>
+                        <outlet property="flowLayout" destination="vbe-6h-Tnn" id="YHR-X0-LsW"/>
                         <outlet property="mapView" destination="L3T-85-g9w" id="4vQ-d2-3Rp"/>
                         <outlet property="photoCollectionView" destination="qbL-1p-yVH" id="W3Q-fv-08L"/>
                         <segue destination="ZDx-q3-vJL" kind="presentation" identifier="ShowImageDetail" id="c1b-IT-42P"/>
@@ -117,7 +122,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vWQ-mz-Ws0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1855.072463768116" y="120.53571428571428"/>
+            <point key="canvasLocation" x="1768" y="122"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="m1d-kg-YH4">
@@ -138,25 +143,25 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XW1-ym-edd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2650.7246376811595" y="112.5"/>
+            <point key="canvasLocation" x="2643" y="122"/>
         </scene>
         <!--Navigation Controller-->
-        <scene sceneID="2Jc-eg-iDh">
+        <scene sceneID="cdp-TM-tSP">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="VrF-eh-dY7" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Mcv-kc-c8A" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Hyy-1o-OP2">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="GDt-cB-kbY">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="0Bf-Ql-63E" kind="relationship" relationship="rootViewController" id="uRw-KI-BhQ"/>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="gpl-RJ-FGc"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Fmf-1N-0V7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4Ie-D9-rvF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="944.92753623188412" y="120.53571428571428"/>
+            <point key="canvasLocation" x="137.68115942028987" y="121.875"/>
         </scene>
     </scenes>
 </document>
