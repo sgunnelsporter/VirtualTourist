@@ -50,7 +50,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         self.photoCollectionView.delegate = self
         self.photoCollectionView.dataSource = self
         // Load the Pin Photos
-        if preloadSavedPhoto() == nil {
+        let savedPhotos = preloadSavedPhoto()
+        if savedPhotos == nil || savedPhotos?.count == 0 {
             //load new images
             self.downloadPhotoInformationFromFlickr()
         } else {
@@ -125,7 +126,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             newPhoto.id = UUID()
             // TO DO: Handle throw
             // TO DO: Move to background queue
-            let downloadQueue = DispatchQueue(label: "download", attributes: [])
+            let downloadQueue = DispatchQueue(label: "dl\(photo.id)", attributes: [])
 
              // call dispatch async to send a closure to the downloads queue
              downloadQueue.async { () -> Void in
@@ -136,25 +137,29 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                     // display it
                     DispatchQueue.main.async(execute: { () -> Void in
                         newPhoto.imageData = imgData
+                            do {
+                                try self.dataContext.save()
+                            } catch {
+                                fatalError("The data could not be saved: \(error.localizedDescription)")
+                            }
+                        print("Appnding to savedImages Array")
+                        self.savedImages.append(newPhoto)
+                        print("Reloading Collection View")
+                        self.photoCollectionView.reloadData()
                     })
                 } catch {
-                    fatalError("The image load could not be performed: \(error.localizedDescription)")
+                    print("The image at \(imageURL.absoluteString): \(error.localizedDescription)")
                 }
                  
              }
             
-            do {
-                try dataContext.save()
-            } catch {
-                fatalError("The data could not be saved: \(error.localizedDescription)")
-            }
+            
              
              // save new photos to Core Data as they download in background queue
              newPhoto.awakeFromInsert()
           
-            photoCollectionView.reloadData()
         }
-        
+                
     }
     
     //MARK: New Collection Request
