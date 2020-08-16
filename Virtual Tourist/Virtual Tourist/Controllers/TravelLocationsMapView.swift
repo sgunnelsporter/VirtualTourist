@@ -118,12 +118,17 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         self.tempNewPin = pin
         
         // Save new pin
-        try? dataContext.save()
+        do {
+            try dataContext.save()
+        } catch {
+            fatalError("The data save could not be performed: \(error.localizedDescription)")
+        }
         
         // Add new annotation to map
         self.mapView.addAnnotation(self.convertPinsToAnnotations(pin))
         
-        FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: loadInitialPhotosFromFlickr(_:error:))
+        //Enhancement - To Do:
+       // FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: loadInitialPhotosFromFlickr(_:error:))
     }
     
     //MARK: MapViewDelegate
@@ -185,8 +190,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         }
     }
     
-    //MARK: Load Initial Set of Photos from Flickr
-    func loadInitialPhotosFromFlickr(_ photoInfo: [PhotoInfo], error: Error?){
+    //MARK: To Do - Load Initial Set of Photos from Flickr
+    /*func loadInitialPhotosFromFlickr(_ photoInfo: [PhotoInfo], error: Error?){
         for photo in photoInfo {
             // save new image
             let imageURL = FlickrAPI.imageURL(farm: photo.farm, server: photo.server, id: photo.id, secret: photo.secret)
@@ -194,15 +199,29 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
             newPhoto.associatedPin = tempNewPin
             newPhoto.id = UUID()
             // TO DO: Handle throw
-            // TO DO: Move to background queue
-            newPhoto.imageData = try? Data(contentsOf: imageURL)
-            // save new photos to Core Data as they download in background queue
-            newPhoto.awakeFromInsert()
-            
+            // Move download to background queue
+            let downloadQueue = DispatchQueue(label: "download", attributes: [])
+
+            // call dispatch async to send a closure to the downloads queue
+            downloadQueue.async { () -> Void in
+
+                // download Data
+                let imgData = try? Data(contentsOf: imageURL)
+
+                // display it
+                DispatchQueue.main.async(execute: { () -> Void in
+                    newPhoto.imageData = imgData
+                })
+            }
+           
             //TO Do: Handle Throw
             try? dataContext.save()
+            
+            // save new photos to Core Data as they download in background queue
+            newPhoto.awakeFromInsert()
         
         }
-    }
+    }*/
+    
 }
 

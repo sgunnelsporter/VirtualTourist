@@ -35,7 +35,6 @@ class FlickrAPI {
                 }
                 return
             }
-            print(String(data: data, encoding: .utf8)!)
             // XML Parser!
             let xmlParser = XMLParser(data: data)
             let delegateStack = ParserDelegateStack(xmlParser: xmlParser)

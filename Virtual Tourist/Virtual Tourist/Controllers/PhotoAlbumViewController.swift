@@ -125,13 +125,33 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             newPhoto.id = UUID()
             // TO DO: Handle throw
             // TO DO: Move to background queue
-            newPhoto.imageData = try! Data(contentsOf: imageURL)
-            // save new photos to Core Data as they download in background queue
-            newPhoto.awakeFromInsert()
+            let downloadQueue = DispatchQueue(label: "download", attributes: [])
+
+             // call dispatch async to send a closure to the downloads queue
+             downloadQueue.async { () -> Void in
+
+                 // download Data
+                do {
+                    let imgData = try Data(contentsOf: imageURL)
+                    // display it
+                    DispatchQueue.main.async(execute: { () -> Void in
+                        newPhoto.imageData = imgData
+                    })
+                } catch {
+                    fatalError("The image load could not be performed: \(error.localizedDescription)")
+                }
+                 
+             }
             
-            //TO Do: Handle Throw
-            try? dataContext.save()
-            
+            do {
+                try dataContext.save()
+            } catch {
+                fatalError("The data could not be saved: \(error.localizedDescription)")
+            }
+             
+             // save new photos to Core Data as they download in background queue
+             newPhoto.awakeFromInsert()
+          
             photoCollectionView.reloadData()
         }
         
@@ -148,9 +168,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
         do {
             try dataContext.execute(batchDeleteRequest)
-
         } catch {
-            // TO DO: Error Handling
+            fatalError("The old image deletes could not be performed: \(error.localizedDescription)")
         }
         
         // Download New Set of Photos
@@ -183,8 +202,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         // delete from core data and save
         self.dataContext.delete(savedImages[indexPath.row])
         self.savedImages.remove(at: indexPath.row)
-        //TO DO: Handle Errors
-        try? self.dataContext.save()
+        do {
+            try self.dataContext.save()
+        } catch {
+            fatalError("The data save could not be performed: \(error.localizedDescription)")
+        }
         // delete from view
         self.photoCollectionView.reloadData()
     }
