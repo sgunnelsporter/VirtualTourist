@@ -93,7 +93,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
     
     func downloadPhotoInformationFromFlickr(){
-        //To Do: Download photos from Flickr
+        //Download photos from Flickr
         // request photo information
         FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: loadPhotosFromFlickr(_:error:))
     }
@@ -119,6 +119,28 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         }
         
     }
+    
+    //MARK: New Collection Request
+    @IBAction func newCollectionRequest(_ sender: Any) {
+        // Clear out old photos
+        // Create Fetch Request
+        let photoFetchRequest:NSFetchRequest<NSFetchRequestResult> = Photo.fetchRequest()
+
+        // Create Batch Delete Request
+        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: photoFetchRequest)
+
+        do {
+            try dataContext.execute(batchDeleteRequest)
+
+        } catch {
+            // Error Handling
+        }
+        
+        // Download New Set of Photos
+        self.downloadPhotoInformationFromFlickr()
+        photoCollectionView.reloadData()
+    }
+    
     
     /*
         // MARK: - Navigation
