@@ -8,7 +8,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Travel Locations Map View-->
+        <!--Virtual Tourist-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="TravelLocationsMapView" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
@@ -33,7 +33,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <navigationItem key="navigationItem" id="FDp-D8-IGp"/>
+                    <navigationItem key="navigationItem" title="Virtual Tourist" id="FDp-D8-IGp"/>
                     <connections>
                         <outlet property="longPressRecognizer" destination="vq7-Tb-FII" id="c7u-aE-uWC"/>
                         <outlet property="mapView" destination="gMH-iQ-cse" id="BqF-IH-3D9"/>
@@ -49,7 +49,7 @@
             </objects>
             <point key="canvasLocation" x="1047.8260869565217" y="121.875"/>
         </scene>
-        <!--Photo Album View Controller-->
+        <!--Photo Album-->
         <scene sceneID="K31-Mk-PMT">
             <objects>
                 <viewController id="0Bf-Ql-63E" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
@@ -107,7 +107,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ehV-8p-orQ"/>
                     </view>
-                    <navigationItem key="navigationItem" id="2P9-a6-VXL">
+                    <navigationItem key="navigationItem" title="Photo Album" id="2P9-a6-VXL">
                         <barButtonItem key="rightBarButtonItem" systemItem="edit" id="N4D-H4-5xd"/>
                     </navigationItem>
                     <connections>
