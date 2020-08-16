@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import MapKit
+import CoreLocation
 
 class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate, UIGestureRecognizerDelegate {
 
@@ -24,6 +25,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     let showPhotoAlbumSegueID = "ShowCollection"
     var annotations = [MKPointAnnotation]()
     let annotationReuseId = "pin"
+    var tempLocationName: String!
     
     //MARK: viewDidLoad
     override func viewDidLoad() {
@@ -95,11 +97,10 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
             //Get map coordinates of long press
             let location = self.longPressRecognizer.location(in: self.mapView)
             let coordinate = self.mapView.convert(location, toCoordinateFrom: self.mapView)
-            // Get the location name from geo search
-            let locationName = self.getPinLocationName(coordinate)
+            self.getPinLocationName(coordinate)
             // Create alert including location name
-            let alertVC = UIAlertController(title: "Add new pin for", message: locationName, preferredStyle: .alert)
-            alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in self.createNewPin(coordinate: coordinate, name: locationName)}))
+            let alertVC = UIAlertController(title: "Add new pin here?", message: self.tempLocationName, preferredStyle: .alert)
+            alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in self.createNewPin(coordinate: coordinate, name: self.tempLocationName)}))
             alertVC.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             // display alert
             present(alertVC, animated: true, completion: nil)
@@ -158,24 +159,25 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     }
     
     //MARK: Get Pin Location Name
-    func getPinLocationName(_ coordinate: CLLocationCoordinate2D) -> String? {
-        var locationName: String!
+    func getPinLocationName(_ coordinate: CLLocationCoordinate2D) -> Void {
         let geoCoder = CLGeocoder()
         // Convert location coordinate to location name.
         geoCoder.reverseGeocodeLocation(CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)) { (places, error) in
             if error == nil{
-                if let place = places{
-                    // Get city & Country
-                    let city = place.first?.locality ?? ""
-                    let country = place.first?.country ?? ""
-                    locationName = "\(city), \(country)"
-                } else {
-                    //TO DO: Handle Error
-                    locationName = "Something weird is happending"
-                }
+                let firstLocation = places?[0]
+                self.setTempLocationName(firstLocation)
+            } else {
+                self.setTempLocationName(nil)
             }
         }
-        return locationName
+    }
+    func setTempLocationName(_ location: CLPlacemark?) -> Void {
+        if location == location {
+            self.tempLocationName = "\(location!.locality ?? ""), \(location!.country ?? "")"
+        } else {
+            //TO DO: Error Handling
+            self.tempLocationName = "Error Occured specifying location. Please try again!"
+        }
     }
 }
 

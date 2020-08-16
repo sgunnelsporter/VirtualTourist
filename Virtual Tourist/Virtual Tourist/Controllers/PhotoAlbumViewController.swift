@@ -38,8 +38,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         
         // Set-up Flow Layout of collection view
         let space : CGFloat = 8.0
-        let wDimension = (view.frame.size.width - (2 * space)) / 3.0
-        let hDimension = (view.frame.size.height - (2 * space)) / 4.0
+        let wDimension = (photoCollectionView.frame.size.width - (2 * space)) / 2.0
+        let hDimension = (photoCollectionView.frame.size.height - (2 * space)) / 3.0
 
         flowLayout.minimumInteritemSpacing = space
         flowLayout.minimumLineSpacing = space
@@ -48,7 +48,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         // Load the Pin
         self.photoCollectionView.dataSource = self;
         self.loadPhotoData()
-        //self.photoCollectionView.dataSource = fetchedPhotoResultsController;
         
     }
     
@@ -66,7 +65,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         let annotation = MKPointAnnotation()
         annotation.coordinate = coordinate
         annotation.title = pin.locationName ?? "Still Empty"
-        annotation.subtitle = pin.id?.uuidString
         
         return annotation
     }
@@ -141,37 +139,23 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         photoCollectionView.reloadData()
     }
     
-    
-    /*
-        // MARK: - Navigation
-
-        // In a storyboard-based application, you will often want to do a little preparation before navigation
-        override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-            // Get the new view controller using segue.destination.
-            // Pass the selected object to the new view controller.
-        }
-        */
-
-    
     //MARK: Collection View Set-up
-   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.fetchedPhotoResultsController.fetchedObjects?.count ?? 0
-   }
-       
-    internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let photo = self.fetchedPhotoResultsController.object(at: indexPath)
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: photoAlbumCellReuseId, for: indexPath) as! PhotoAlbumCell
            // Set the image
         cell.imageView?.image = UIImage(data: photo.imageData!)
            
         return cell
-   }
-       
-   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath:IndexPath) {
-       //To Do: Segue on tap, unless in edit mode
-       //perform segue to detail view
-           
-   }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        print("Item Selected")
+    }
 }
 
     
