@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import MapKit
 
-class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
+class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
 
     //MARK: View Outlets
     @IBOutlet weak var mapView: MKMapView!
@@ -35,8 +35,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMa
         annotation.append(self.setPinToAnnotation(pin))
         self.mapView.addAnnotations(self.annotation)
         
-        // Load the Pin
-        self.loadPhotoData()
         
         // Set-up Flow Layout of collection view
         let space : CGFloat = 8.0
@@ -46,6 +44,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMa
         flowLayout.minimumInteritemSpacing = space
         flowLayout.minimumLineSpacing = space
         flowLayout.itemSize = CGSize(width: wDimension, height: hDimension)
+        
+        // Load the Pin
+        self.photoCollectionView.dataSource = self;
+        self.loadPhotoData()
+        //self.photoCollectionView.dataSource = fetchedPhotoResultsController;
         
     }
     
@@ -92,10 +95,10 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMa
     func downloadPhotoInformationFromFlickr(){
         //To Do: Download photos from Flickr
         // request photo information
-        FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: downloadPhotosFromFlickr(_:error:))
+        FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: loadPhotosFromFlickr(_:error:))
     }
     
-    func downloadPhotosFromFlickr(_ photoInfo: [PhotoInfo], error: Error?){
+    func loadPhotosFromFlickr(_ photoInfo: [PhotoInfo], error: Error?){
         // download each photo
         for photo in photoInfo {
             // save new image
@@ -133,7 +136,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, MKMa
         return self.fetchedPhotoResultsController.fetchedObjects?.count ?? 0
    }
        
-    private func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let photo = self.fetchedPhotoResultsController.object(at: indexPath)
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: photoAlbumCellReuseId, for: indexPath) as! PhotoAlbumCell
            // Set the image
