@@ -17,7 +17,7 @@ class FlickrAPI {
         }
     }
     
-    class func locationSearchURL(lat: Double, lon: Double, page: Int) -> URL? {
+    class func locationSearchURL(lat: Double, lon: Double, page: UInt32) -> URL? {
         // example URL for each with lat/lon : https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=cf5e26ab866d8f7e61b97552cf489baa&lat=48.856&lon=2.353&radius=2&radius_units=miles&per_page=50&page=1
         let fullURL = Endpoint.baseURL.rawValue + "&lat=\(lat)&lon=\(lon)&page=\(page)"
         return URL(string: fullURL)
@@ -25,7 +25,7 @@ class FlickrAPI {
     
     class func getPhotosForLocation(lat:Double, lon: Double, completion: @escaping ([PhotoInfo], Error?) -> Void) {
         //TO DO: Add random number generator to page.
-        let page = 4;
+        let page = 1 + arc4random() % 50
         let url = self.locationSearchURL(lat: lat, lon: lon, page: page)
         let urlRequest = URLRequest(url: url!)
         let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
@@ -36,7 +36,7 @@ class FlickrAPI {
                 return
             }
             print(String(data: data, encoding: .utf8)!)
-            // TO DO: Change to XML Parser!
+            // XML Parser!
             let xmlParser = XMLParser(data: data)
             let delegateStack = ParserDelegateStack(xmlParser: xmlParser)
 
