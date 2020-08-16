@@ -133,7 +133,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             try dataContext.execute(batchDeleteRequest)
 
         } catch {
-            // Error Handling
+            // TO DO: Error Handling
         }
         
         // Download New Set of Photos

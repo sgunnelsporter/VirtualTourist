@@ -102,7 +102,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
             alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in self.createNewPin(coordinate: coordinate, name: locationName)}))
             alertVC.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             // display alert
-            show(alertVC, sender: nil)
+            present(alertVC, animated: true, completion: nil)
         }
     }
     
