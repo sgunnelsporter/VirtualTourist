@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import MapKit
+import CoreLocation
 
 class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate, UIGestureRecognizerDelegate {
 
@@ -24,6 +25,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     let showPhotoAlbumSegueID = "ShowCollection"
     var annotations = [MKPointAnnotation]()
     let annotationReuseId = "pin"
+    var tempNewPin: Pin!
+    var tempLocationName: String!
     
     //MARK: viewDidLoad
     override func viewDidLoad() {
@@ -95,14 +98,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
             //Get map coordinates of long press
             let location = self.longPressRecognizer.location(in: self.mapView)
             let coordinate = self.mapView.convert(location, toCoordinateFrom: self.mapView)
-            // Get the location name from geo search
-            let locationName = self.getPinLocationName(coordinate)
+            self.getPinLocationName(coordinate)
             // Create alert including location name
-            let alertVC = UIAlertController(title: "Add new pin for", message: locationName, preferredStyle: .alert)
-            alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in self.createNewPin(coordinate: coordinate, name: locationName)}))
+            let alertVC = UIAlertController(title: "Add new pin here?", message: self.tempLocationName, preferredStyle: .alert)
+            alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in self.createNewPin(coordinate: coordinate, name: self.tempLocationName)}))
             alertVC.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             // display alert
-            show(alertVC, sender: nil)
+            present(alertVC, animated: true, completion: nil)
         }
     }
     
@@ -113,11 +115,15 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         pin.longitude = coordinate.longitude
         pin.locationName = name ?? "Empty"
         
+        self.tempNewPin = pin
+        
         // Save new pin
         try? dataContext.save()
         
         // Add new annotation to map
         self.mapView.addAnnotation(self.convertPinsToAnnotations(pin))
+        
+        FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: loadInitialPhotosFromFlickr(_:error:))
     }
     
     //MARK: MapViewDelegate
@@ -158,24 +164,45 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     }
     
     //MARK: Get Pin Location Name
-    func getPinLocationName(_ coordinate: CLLocationCoordinate2D) -> String? {
-        var locationName: String!
+    func getPinLocationName(_ coordinate: CLLocationCoordinate2D) -> Void {
         let geoCoder = CLGeocoder()
         // Convert location coordinate to location name.
         geoCoder.reverseGeocodeLocation(CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)) { (places, error) in
             if error == nil{
-                if let place = places{
-                    // Get city & Country
-                    let city = place.first?.locality ?? ""
-                    let country = place.first?.country ?? ""
-                    locationName = "\(city), \(country)"
-                } else {
-                    //TO DO: Handle Error
-                    locationName = "Something weird is happending"
-                }
+                let firstLocation = places?[0]
+                self.setTempLocationName(firstLocation)
+            } else {
+                self.setTempLocationName(nil)
             }
         }
-        return locationName
+    }
+    func setTempLocationName(_ location: CLPlacemark?) -> Void {
+        if location == location {
+            self.tempLocationName = "\(location!.locality ?? ""), \(location!.country ?? "")"
+        } else {
+            //TO DO: Error Handling
+            self.tempLocationName = "Error Occured specifying location. Please try again!"
+        }
+    }
+    
+    //MARK: Load Initial Set of Photos from Flickr
+    func loadInitialPhotosFromFlickr(_ photoInfo: [PhotoInfo], error: Error?){
+        for photo in photoInfo {
+            // save new image
+            let imageURL = FlickrAPI.imageURL(farm: photo.farm, server: photo.server, id: photo.id, secret: photo.secret)
+            let newPhoto = Photo(context: dataContext)
+            newPhoto.associatedPin = tempNewPin
+            newPhoto.id = UUID()
+            // TO DO: Handle throw
+            // TO DO: Move to background queue
+            newPhoto.imageData = try! Data(contentsOf: imageURL)
+            // save new photos to Core Data as they download in background queue
+            newPhoto.awakeFromInsert()
+            
+            //TO Do: Handle Throw
+            try? dataContext.save()
+        
+        }
     }
 }
 
