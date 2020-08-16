@@ -34,6 +34,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         //Add pin to the Map
         annotation.append(self.setPinToAnnotation(pin))
         self.mapView.addAnnotations(self.annotation)
+        self.mapView.setCenter(self.annotation.first!.coordinate, animated: true)
         
         
         // Set-up Flow Layout of collection view
