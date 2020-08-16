@@ -25,6 +25,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     let showPhotoAlbumSegueID = "ShowCollection"
     var annotations = [MKPointAnnotation]()
     let annotationReuseId = "pin"
+    var tempNewPin: Pin!
     var tempLocationName: String!
     
     //MARK: viewDidLoad
@@ -114,11 +115,15 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         pin.longitude = coordinate.longitude
         pin.locationName = name ?? "Empty"
         
+        self.tempNewPin = pin
+        
         // Save new pin
         try? dataContext.save()
         
         // Add new annotation to map
         self.mapView.addAnnotation(self.convertPinsToAnnotations(pin))
+        
+        FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: loadInitialPhotosFromFlickr(_:error:))
     }
     
     //MARK: MapViewDelegate
@@ -177,6 +182,26 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         } else {
             //TO DO: Error Handling
             self.tempLocationName = "Error Occured specifying location. Please try again!"
+        }
+    }
+    
+    //MARK: Load Initial Set of Photos from Flickr
+    func loadInitialPhotosFromFlickr(_ photoInfo: [PhotoInfo], error: Error?){
+        for photo in photoInfo {
+            // save new image
+            let imageURL = FlickrAPI.imageURL(farm: photo.farm, server: photo.server, id: photo.id, secret: photo.secret)
+            let newPhoto = Photo(context: dataContext)
+            newPhoto.associatedPin = tempNewPin
+            newPhoto.id = UUID()
+            // TO DO: Handle throw
+            // TO DO: Move to background queue
+            newPhoto.imageData = try! Data(contentsOf: imageURL)
+            // save new photos to Core Data as they download in background queue
+            newPhoto.awakeFromInsert()
+            
+            //TO Do: Handle Throw
+            try? dataContext.save()
+        
         }
     }
 }

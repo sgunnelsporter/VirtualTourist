@@ -20,9 +20,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     //MARK: Data Handling
     var dataContext:NSManagedObjectContext!
     var pin:Pin!
-    var fetchedPhotoResultsController:NSFetchedResultsController<Photo>!
     
     var annotation = [MKPointAnnotation]()
+    var savedImages:[Photo] = []
     
     //MARK: Other Variables
     let photoAlbumCellReuseId = "PhotoAlbumCell"
@@ -39,17 +39,24 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         
         // Set-up Flow Layout of collection view
         let space : CGFloat = 8.0
-        let wDimension = (photoCollectionView.frame.size.width - (2 * space)) / 2.0
-        let hDimension = (photoCollectionView.frame.size.height - (2 * space)) / 3.0
+        let wDimension = (photoCollectionView.frame.size.width - (2 * space)) / 4.0
+        let hDimension = (photoCollectionView.frame.size.height - (2 * space)) / 5.0
 
         flowLayout.minimumInteritemSpacing = space
         flowLayout.minimumLineSpacing = space
         flowLayout.itemSize = CGSize(width: wDimension, height: hDimension)
         
-        // Load the Pin
-        self.photoCollectionView.dataSource = self;
-        self.loadPhotoData()
-        
+        // Set Photo Collection Attributes
+        self.photoCollectionView.delegate = self
+        self.photoCollectionView.dataSource = self
+        // Load the Pin Photos
+        if preloadSavedPhoto() == nil {
+            //load new images
+            self.downloadPhotoInformationFromFlickr()
+        } else {
+            savedImages = preloadSavedPhoto()!
+        }
+                
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -71,7 +78,25 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
     
     //MARK: Load the Photo Data
-    func loadPhotoData(){
+    func preloadSavedPhoto() -> [Photo]? {
+        do {
+            var photoArray:[Photo] = []
+            let fetchedPhotoResultsController = getFetchRequestController()
+            try fetchedPhotoResultsController.performFetch()
+            let photoCount = try fetchedPhotoResultsController.managedObjectContext.count(for: fetchedPhotoResultsController.fetchRequest)
+            for index in 0..<photoCount {
+                photoArray.append(fetchedPhotoResultsController.object(at: IndexPath(row: index, section: 0)))
+            }
+            return photoArray
+        } catch {
+            return nil
+        }
+    }
+    
+    func getFetchRequestController() -> NSFetchedResultsController<Photo> {
+       
+        var fetchedPhotoResultsController:NSFetchedResultsController<Photo>!
+        
         // make fetch request for the photos for this Pin
         let photoFetchRequest:NSFetchRequest<Photo> = Photo.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "id", ascending: false)
@@ -80,15 +105,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         photoFetchRequest.predicate = photoPredicate
         fetchedPhotoResultsController = NSFetchedResultsController(fetchRequest: photoFetchRequest, managedObjectContext: dataContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedPhotoResultsController.delegate = self
-        do{
-            try fetchedPhotoResultsController.performFetch()
-        } catch {
-            fatalError("The fetch could not be performed: \(error.localizedDescription)")
-        }
-        // check if photos exist for this pin
-        if fetchedPhotoResultsController.fetchedObjects!.isEmpty {
-            self.downloadPhotoInformationFromFlickr()
-        }
+        
+        return fetchedPhotoResultsController
     }
     
     func downloadPhotoInformationFromFlickr(){
@@ -142,20 +160,33 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     //MARK: Collection View Set-up
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.fetchedPhotoResultsController.fetchedObjects?.count ?? 0
+        return self.savedImages.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let photo = self.fetchedPhotoResultsController.object(at: indexPath)
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: photoAlbumCellReuseId, for: indexPath) as! PhotoAlbumCell
            // Set the image
-        cell.imageView?.image = UIImage(data: photo.imageData!)
+        cell.imageView?.image = UIImage(data: self.savedImages[indexPath.row].imageData!)
            
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        print("Item Selected")
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let alertVC = UIAlertController(title: "Delete this image?", message: nil, preferredStyle: .alert)
+        alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in self.deletePhoto(indexPath: indexPath)}))
+        alertVC.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        // display alert
+        present(alertVC, animated: true, completion: nil)
+    }
+    
+    func deletePhoto(indexPath: IndexPath){
+        // delete from core data and save
+        self.dataContext.delete(savedImages[indexPath.row])
+        self.savedImages.remove(at: indexPath.row)
+        //TO DO: Handle Errors
+        try? self.dataContext.save()
+        // delete from view
+        self.photoCollectionView.reloadData()
     }
 }
 
