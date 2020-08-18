@@ -189,14 +189,13 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                         cell.imageView?.image = UIImage(data: (self.savedImages[indexPath.row]?.imageData)!)
                         cell.activityIndicator.stopAnimating()
                     })
-                    // Update Core Data to match new savedImage
-                    self.dataContext.refresh(self.savedImages[indexPath.row]!, mergeChanges: true)
                     // Save Core Data
                     do {
                         try self.dataContext.save()
                     } catch {
                         fatalError("The data could not be saved: \(error.localizedDescription)")
                     }
+                    self.savedImages[indexPath.row]?.awakeFromInsert()
                 }
             }
         }
@@ -213,21 +212,19 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
     
     func deletePhoto(indexPath: IndexPath){
-        // find associated Photo from Core Data
+        // Delete from Core Data
+        self.dataContext.delete(savedImages[indexPath.row]!)
         
-        // delete from view
+        // Delete from view
         self.savedImages.remove(at: indexPath.row)
         self.photoCollectionView.reloadData()
         
-        // delete from core data and save
-        self.dataContext.delete(savedImages[indexPath.row]!)
-        
+        // Save Core Data
         do {
             try self.dataContext.save()
         } catch {
             fatalError("The data save could not be performed: \(error.localizedDescription)")
         }
-        // delete from view
     }
 }
 
