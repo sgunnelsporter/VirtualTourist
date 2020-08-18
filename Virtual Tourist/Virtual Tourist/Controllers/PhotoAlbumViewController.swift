@@ -22,7 +22,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     var pin:Pin!
     
     var annotation = [MKPointAnnotation]()
-    var savedImages:[Photo] = []
+    var loadedPhotoInfo:[PhotoInfo] = []
+    var savedImages:[Photo?] = []
     
     //MARK: Other Variables
     let photoAlbumCellReuseId = "PhotoAlbumCell"
@@ -49,13 +50,14 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         // Set Photo Collection Attributes
         self.photoCollectionView.delegate = self
         self.photoCollectionView.dataSource = self
-        // Load the Pin Photos
+        
+        // Load the Pin Photos if needed
         let savedPhotos = preloadSavedPhoto()
-        if savedPhotos == nil || savedPhotos?.count == 0 {
+        if savedPhotos.count == 0 {
             //load new images
             self.downloadPhotoInformationFromFlickr()
         } else {
-            savedImages = preloadSavedPhoto()!
+            savedImages = preloadSavedPhoto()
         }
                 
     }
@@ -79,19 +81,20 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
     
     //MARK: Load the Photo Data
-    func preloadSavedPhoto() -> [Photo]? {
+    func preloadSavedPhoto() -> [Photo?] {
+        var photoArray:[Photo?] = []
         do {
-            var photoArray:[Photo] = []
             let fetchedPhotoResultsController = getFetchRequestController()
             try fetchedPhotoResultsController.performFetch()
             let photoCount = try fetchedPhotoResultsController.managedObjectContext.count(for: fetchedPhotoResultsController.fetchRequest)
             for index in 0..<photoCount {
                 photoArray.append(fetchedPhotoResultsController.object(at: IndexPath(row: index, section: 0)))
             }
-            return photoArray
         } catch {
-            return nil
+            fatalError("There was an error loading photo data from core!")
         }
+        return photoArray
+
     }
     
     func getFetchRequestController() -> NSFetchedResultsController<Photo> {
@@ -113,53 +116,33 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     func downloadPhotoInformationFromFlickr(){
         //Download photos from Flickr
         // request photo information
-        FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: loadPhotosFromFlickr(_:error:))
+        FlickrAPI.getPhotosForLocation(pin: pin, completion: loadPhotoInfoFromFlickr(pin:_:error:))
     }
     
-    func loadPhotosFromFlickr(_ photoInfo: [PhotoInfo], error: Error?){
-        // download each photo
-        for photo in photoInfo {
-            // save new image
-            let imageURL = FlickrAPI.imageURL(farm: photo.farm, server: photo.server, id: photo.id, secret: photo.secret)
-            let newPhoto = Photo(context: dataContext)
-            newPhoto.associatedPin = pin
-            newPhoto.id = UUID()
-            // TO DO: Handle throw
-            // TO DO: Move to background queue
-            let downloadQueue = DispatchQueue(label: "dl\(photo.id)", attributes: [])
-
-             // call dispatch async to send a closure to the downloads queue
-             downloadQueue.async { () -> Void in
-
-                 // download Data
-                do {
-                    let imgData = try Data(contentsOf: imageURL)
-                    // display it
-                    DispatchQueue.main.async(execute: { () -> Void in
-                        newPhoto.imageData = imgData
-                            do {
-                                try self.dataContext.save()
-                            } catch {
-                                fatalError("The data could not be saved: \(error.localizedDescription)")
-                            }
-                        print("Appnding to savedImages Array")
-                        self.savedImages.append(newPhoto)
-                        print("Reloading Collection View")
-                        self.photoCollectionView.reloadData()
-                    })
-                } catch {
-                    print("The image at \(imageURL.absoluteString): \(error.localizedDescription)")
-                }
-                 
-             }
-            
-            
-             
-             // save new photos to Core Data as they download in background queue
-             newPhoto.awakeFromInsert()
-          
+    func loadPhotoInfoFromFlickr(pin: Pin,_ photoInfo: [PhotoInfo], error: Error?){
+        if error == nil {
+            self.loadedPhotoInfo = photoInfo
+        } else {
+            // TO DO: Error Handling
+            print("The photo info failed to download: \(error!.localizedDescription)")
         }
-                
+    }
+    
+    //MARK: Download the Photo from Flickr using PhotoInfo
+    func downloadPhotoFromFlickr(_ photoURL: URL, photo: Photo) -> Void {
+        let downloadQueue = DispatchQueue(label: "dl:\(photoURL)", attributes: [])
+
+         // call dispatch async to send a closure to the downloads queue
+        downloadQueue.async { () -> Void in
+
+             // download Data
+            do {
+                let imgData = try Data(contentsOf: photoURL)
+                photo.imageData = imgData
+            } catch {
+                print("The image at \(photoURL.absoluteString): \(error.localizedDescription)")
+            }
+        }
     }
     
     //MARK: New Collection Request
@@ -187,13 +170,47 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     //MARK: Collection View Set-up
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.savedImages.count
+        return 25
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        // Create Cell
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: photoAlbumCellReuseId, for: indexPath) as! PhotoAlbumCell
-           // Set the image
-        cell.imageView?.image = UIImage(data: self.savedImages[indexPath.row].imageData!)
+        // Check for photo and set if there
+        if !self.savedImages.isEmpty {
+            if let photo = self.savedImages[indexPath.row] {
+                cell.activityIndicator.stopAnimating()
+                cell.imageView?.image = UIImage(data: photo.imageData!)
+            }
+        } else {
+            // TO DO: Set the activity indicator to enabled
+            cell.activityIndicator.startAnimating()
+            // Create New Photo for CoreData
+            let newPhoto = Photo(context: dataContext)
+            newPhoto.associatedPin = pin
+            newPhoto.id = UUID()
+            // Download image -> Background queue & set to New Photo
+            let photoInfo = self.loadedPhotoInfo[indexPath.row]
+            let imageURL = FlickrAPI.imageURL(farm: photoInfo.farm, server: photoInfo.server, id: photoInfo.id, secret: photoInfo.secret)
+            self.downloadPhotoFromFlickr(imageURL, photo: newPhoto)
+            //  Save Core Data
+            do {
+                try self.dataContext.save()
+            } catch {
+                fatalError("The data could not be saved: \(error.localizedDescription)")
+            }
+            newPhoto.awakeFromInsert()
+            print("Appnding to savedImages Array")
+            self.savedImages.append(newPhoto)
+            
+            // Reload Data assigned to main queue
+            DispatchQueue.main.async(execute: { () -> Void in
+                print("Load Image View")
+                cell.imageView?.image = UIImage(data: newPhoto.imageData!)
+                cell.activityIndicator.stopAnimating()
+            })
+        }
+        
            
         return cell
     }
@@ -207,16 +224,21 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
     
     func deletePhoto(indexPath: IndexPath){
-        // delete from core data and save
-        self.dataContext.delete(savedImages[indexPath.row])
+        // find associated Photo from Core Data
+        
+        // delete from view
         self.savedImages.remove(at: indexPath.row)
+        self.photoCollectionView.reloadData()
+        
+        // delete from core data and save
+        self.dataContext.delete(savedImages[indexPath.row]!)
+        
         do {
             try self.dataContext.save()
         } catch {
             fatalError("The data save could not be performed: \(error.localizedDescription)")
         }
         // delete from view
-        self.photoCollectionView.reloadData()
     }
 }
 

@@ -128,7 +128,28 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         self.mapView.addAnnotation(self.convertPinsToAnnotations(pin))
         
         //Enhancement - To Do:
-       // FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: loadInitialPhotosFromFlickr(_:error:))
+        FlickrAPI.getPhotosForLocation(pin: pin, completion: loadPhotoInfoFromFlickr(pin:_:error:))
+    }
+    
+    //MARK: Completion Function for getting Photo Info from Flickr
+    func loadPhotoInfoFromFlickr(pin: Pin,_ photoInfo: [PhotoInfo], error: Error?){
+        if error == nil {
+            for info in photoInfo {
+                let newPhoto = Photo(context: dataContext)
+                newPhoto.associatedPin = pin
+                newPhoto.id = UUID()
+                newPhoto.imageURL = FlickrAPI.imageURL(farm: info.farm, server: info.server, id: info.id, secret: info.secret)
+                //  Save Core Data
+                do {
+                    try self.dataContext.save()
+                } catch {
+                    fatalError("The data could not be saved: \(error.localizedDescription)")
+                }
+            }
+        } else {
+            // TO DO: Error Handling
+            print("The photo info failed to download: \(error!.localizedDescription)")
+        }
     }
     
     //MARK: MapViewDelegate
@@ -182,46 +203,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         }
     }
     func setTempLocationName(_ location: CLPlacemark?) -> Void {
-        if location == location {
-            self.tempLocationName = "\(location!.locality ?? ""), \(location!.country ?? "")"
+        if let location = location {
+            self.tempLocationName = "\(location.locality ?? ""), \(location.country ?? "")"
         } else {
             //TO DO: Error Handling
             self.tempLocationName = "Error Occured specifying location. Please try again!"
         }
     }
-    
-    //MARK: To Do - Load Initial Set of Photos from Flickr
-    /*func loadInitialPhotosFromFlickr(_ photoInfo: [PhotoInfo], error: Error?){
-        for photo in photoInfo {
-            // save new image
-            let imageURL = FlickrAPI.imageURL(farm: photo.farm, server: photo.server, id: photo.id, secret: photo.secret)
-            let newPhoto = Photo(context: dataContext)
-            newPhoto.associatedPin = tempNewPin
-            newPhoto.id = UUID()
-            // TO DO: Handle throw
-            // Move download to background queue
-            let downloadQueue = DispatchQueue(label: "download", attributes: [])
-
-            // call dispatch async to send a closure to the downloads queue
-            downloadQueue.async { () -> Void in
-
-                // download Data
-                let imgData = try? Data(contentsOf: imageURL)
-
-                // display it
-                DispatchQueue.main.async(execute: { () -> Void in
-                    newPhoto.imageData = imgData
-                })
-            }
-           
-            //TO Do: Handle Throw
-            try? dataContext.save()
-            
-            // save new photos to Core Data as they download in background queue
-            newPhoto.awakeFromInsert()
-        
-        }
-    }*/
     
 }
 

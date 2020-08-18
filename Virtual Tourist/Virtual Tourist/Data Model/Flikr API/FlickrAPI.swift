@@ -23,15 +23,15 @@ class FlickrAPI {
         return URL(string: fullURL)
     }
     
-    class func getPhotosForLocation(lat:Double, lon: Double, completion: @escaping ([PhotoInfo], Error?) -> Void) {
+    class func getPhotosForLocation(pin: Pin, completion: @escaping (Pin, [PhotoInfo], Error?) -> Void) {
         //TO DO: Add random number generator to page.
         let page = Int.random(in: 1...10)
-        let url = self.locationSearchURL(lat: lat, lon: lon, page: page)
+        let url = self.locationSearchURL(lat: pin.latitude, lon: pin.longitude, page: page)
         let urlRequest = URLRequest(url: url!)
         let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             guard let data = data else {
                 DispatchQueue.main.async {
-                    completion([], error)
+                    completion(pin, [], error)
                 }
                 return
             }
@@ -46,12 +46,12 @@ class FlickrAPI {
                 print("Done parsing")
                 print(responseParser.result!.total)
                 DispatchQueue.main.async {
-                    completion(responseParser.result!.photos, nil)
+                    completion(pin, responseParser.result!.photos, nil)
                 }
             } else {
                 print("Invalid xml", xmlParser.parserError?.localizedDescription ?? "")
                 DispatchQueue.main.async {
-                    completion([], error)
+                    completion(pin,[], error)
                 }
             }
         }
