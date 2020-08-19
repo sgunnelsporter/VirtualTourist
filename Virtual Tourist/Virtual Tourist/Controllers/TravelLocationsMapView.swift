@@ -18,14 +18,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     @IBOutlet var longPressRecognizer: UILongPressGestureRecognizer!
     
     //MARK: Data
-    var dataContext:NSManagedObjectContext!
+    var dataContext:NSManagedObjectContext = DataContext.persistentContainer.viewContext
     var fetchedResultsController:NSFetchedResultsController<Pin>!
     
     //MARK: Variable definitions
     let showPhotoAlbumSegueID = "ShowCollection"
     var annotations = [MKPointAnnotation]()
     let annotationReuseId = "pin"
-    var tempNewPin: Pin!
     var tempLocationName: String!
     
     //MARK: viewDidLoad
@@ -33,8 +32,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         super.viewDidLoad()
         self.mapView.delegate = self
         // Set Data Context
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        self.dataContext = appDelegate?.persistentContainer.viewContext
         self.longPressRecognizer.delegate = self
         self.mapView.addGestureRecognizer(longPressRecognizer)
         self.setupFetchedResultsController()
@@ -100,7 +97,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
             let coordinate = self.mapView.convert(location, toCoordinateFrom: self.mapView)
             self.getPinLocationName(coordinate)
             // Create alert including location name
-            let alertVC = UIAlertController(title: "Add new pin here?", message: self.tempLocationName, preferredStyle: .alert)
+            let alertVC = UIAlertController(title: "Add new pin here?", message: "", preferredStyle: .alert)
             alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in self.createNewPin(coordinate: coordinate, name: self.tempLocationName)}))
             alertVC.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             // display alert
@@ -110,13 +107,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     
     func createNewPin(coordinate: CLLocationCoordinate2D, name: String?){
         //Create and save new pin to Core Data
-        let pin = Pin(context: dataContext)
-        pin.latitude = coordinate.latitude
-        pin.longitude = coordinate.longitude
-        pin.locationName = name ?? "Empty"
-        
-        self.tempNewPin = pin
-        
+        let pin = Pin.createNew(latitude: coordinate.latitude, longitude: coordinate.longitude, locationName: name ?? "Empty")
+                
         // Save new pin
         do {
             try dataContext.save()
@@ -127,8 +119,29 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         // Add new annotation to map
         self.mapView.addAnnotation(self.convertPinsToAnnotations(pin))
         
-        //Enhancement - To Do:
-       // FlickrAPI.getPhotosForLocation(lat: pin.latitude, lon: pin.longitude, completion: loadInitialPhotosFromFlickr(_:error:))
+       // Get Photo Information when Pin Created
+        FlickrAPI.getPhotosForLocation(pin: pin, completion: loadPhotoInfoFromFlickr(pin:_:error:))
+    }
+    
+    //MARK: Completion Function for getting Photo Info from Flickr
+    func loadPhotoInfoFromFlickr(pin: Pin,_ photoInfo: [PhotoInfo], error: Error?){
+        if error == nil {
+            for info in photoInfo {
+                let newPhoto = Photo(context: dataContext)
+                newPhoto.associatedPin = pin
+                newPhoto.id = UUID()
+                newPhoto.imageURL = FlickrAPI.imageURL(farm: info.farm, server: info.server, id: info.id, secret: info.secret)
+                //  Save Core Data
+                do {
+                    try self.dataContext.save()
+                } catch {
+                    fatalError("The data could not be saved: \(error.localizedDescription)")
+                }
+            }
+        } else {
+            // TO DO: Error Handling
+            print("The photo info failed to download: \(error!.localizedDescription)")
+        }
     }
     
     //MARK: MapViewDelegate
@@ -164,7 +177,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
             //Send Pin and View Context to Album View
            let vc = segue.destination as! PhotoAlbumViewController
             vc.pin = sender as! Pin?
-            vc.dataContext = self.dataContext
         }
     }
     
@@ -182,46 +194,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         }
     }
     func setTempLocationName(_ location: CLPlacemark?) -> Void {
-        if location == location {
-            self.tempLocationName = "\(location!.locality ?? ""), \(location!.country ?? "")"
+        if let location = location {
+            self.tempLocationName = "\(location.locality ?? ""), \(location.country ?? "")"
         } else {
             //TO DO: Error Handling
             self.tempLocationName = "Error Occured specifying location. Please try again!"
         }
     }
-    
-    //MARK: To Do - Load Initial Set of Photos from Flickr
-    /*func loadInitialPhotosFromFlickr(_ photoInfo: [PhotoInfo], error: Error?){
-        for photo in photoInfo {
-            // save new image
-            let imageURL = FlickrAPI.imageURL(farm: photo.farm, server: photo.server, id: photo.id, secret: photo.secret)
-            let newPhoto = Photo(context: dataContext)
-            newPhoto.associatedPin = tempNewPin
-            newPhoto.id = UUID()
-            // TO DO: Handle throw
-            // Move download to background queue
-            let downloadQueue = DispatchQueue(label: "download", attributes: [])
-
-            // call dispatch async to send a closure to the downloads queue
-            downloadQueue.async { () -> Void in
-
-                // download Data
-                let imgData = try? Data(contentsOf: imageURL)
-
-                // display it
-                DispatchQueue.main.async(execute: { () -> Void in
-                    newPhoto.imageData = imgData
-                })
-            }
-           
-            //TO Do: Handle Throw
-            try? dataContext.save()
-            
-            // save new photos to Core Data as they download in background queue
-            newPhoto.awakeFromInsert()
-        
-        }
-    }*/
     
 }
 
