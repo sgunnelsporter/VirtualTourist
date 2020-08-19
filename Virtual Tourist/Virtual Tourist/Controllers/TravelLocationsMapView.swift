@@ -25,7 +25,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     let showPhotoAlbumSegueID = "ShowCollection"
     var annotations = [MKPointAnnotation]()
     let annotationReuseId = "pin"
-    var tempNewPin: Pin!
     var tempLocationName: String!
     
     //MARK: viewDidLoad
@@ -98,7 +97,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
             let coordinate = self.mapView.convert(location, toCoordinateFrom: self.mapView)
             self.getPinLocationName(coordinate)
             // Create alert including location name
-            let alertVC = UIAlertController(title: "Add new pin here?", message: self.tempLocationName, preferredStyle: .alert)
+            let alertVC = UIAlertController(title: "Add new pin here?", message: "", preferredStyle: .alert)
             alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in self.createNewPin(coordinate: coordinate, name: self.tempLocationName)}))
             alertVC.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             // display alert
@@ -108,13 +107,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     
     func createNewPin(coordinate: CLLocationCoordinate2D, name: String?){
         //Create and save new pin to Core Data
-        let pin = Pin(context: dataContext)
-        pin.latitude = coordinate.latitude
-        pin.longitude = coordinate.longitude
-        pin.locationName = name ?? "Empty"
-        
-        self.tempNewPin = pin
-        
+        let pin = Pin.createNew(latitude: coordinate.latitude, longitude: coordinate.longitude, locationName: name ?? "Empty")
+                
         // Save new pin
         do {
             try dataContext.save()
@@ -125,7 +119,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         // Add new annotation to map
         self.mapView.addAnnotation(self.convertPinsToAnnotations(pin))
         
-        //Enhancement - To Do:
+       // Get Photo Information when Pin Created
         FlickrAPI.getPhotosForLocation(pin: pin, completion: loadPhotoInfoFromFlickr(pin:_:error:))
     }
     

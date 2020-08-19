@@ -104,22 +104,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         return fetchedPhotoResultsController
     }
     
-    func downloadPhotoInformationFromFlickr(){
-        //Download photos from Flickr
-        // request photo information
-        FlickrAPI.getPhotosForLocation(pin: pin, completion: loadPhotoInfoFromFlickr(pin:_:error:))
-    }
     
-    func loadPhotoInfoFromFlickr(pin: Pin,_ photoInfo: [PhotoInfo], error: Error?){
-        if error == nil {
-            for info in photoInfo {
-                Photo.createNew(pin: pin, info: info)
-            }
-        } else {
-            // TO DO: Error Handling
-            print("The photo info failed to download: \(error!.localizedDescription)")
-        }
-    }
 
     
     //MARK: Download the Photo from Flickr using PhotoInfo
@@ -134,7 +119,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                 do {
                     try self.dataContext.save()
                 } catch {
-                    fatalError("The old image deletes could not be performed: \(error.localizedDescription)")
+                    fatalError("The data save failed: \(error.localizedDescription)")
                 }
                 DispatchQueue.main.async {
                     self.photoCollectionView.reloadItems(at: [index])
@@ -147,28 +132,28 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     //MARK: New Collection Request
     @IBAction func newCollectionRequest(_ sender: Any) {
         // Clear out old photos
-        for photo in savedImages {
-            photo.imageURL = nil
-            photo.imageData = nil
-            do {
-                try dataContext.save()
-            } catch {
-                fatalError("The old image deletes could not be performed: \(error.localizedDescription)")
-            }
-        }
-        
-        // Full delete of savedImages
-        photoCollectionView.reloadData()
-
+        pin.removePhotos(savedImages)
         // Reset Photo Info Array
-        self.loadedPhotoInfo = []
+        self.loadedPhotoInfo.removeAll()
+        self.savedImages.removeAll()
 
         // Download New Set of Photos
-        self.downloadPhotoInformationFromFlickr()
-        self.preloadSavedPhotos()
+        FlickrAPI.getPhotosForLocation(pin: pin, completion: loadPhotoInfoFromFlickr(pin:_:error:))
         photoCollectionView.reloadData()
     }
     
+    func loadPhotoInfoFromFlickr(pin: Pin,_ photoInfo: [PhotoInfo], error: Error?){
+        if error == nil {
+            self.loadedPhotoInfo = photoInfo
+            for info in photoInfo {
+                self.savedImages.append(Photo.createNew(pin: pin, info: info))
+            }
+            self.photoCollectionView.reloadData()
+        } else {
+            // TO DO: Error Handling
+            print("The photo info failed to download: \(error!.localizedDescription)")
+        }
+    }
     //MARK: Collection View Set-up
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return savedImages.count

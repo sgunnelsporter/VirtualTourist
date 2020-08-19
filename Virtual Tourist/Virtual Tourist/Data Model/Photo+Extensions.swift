@@ -10,19 +10,22 @@ import Foundation
 import CoreData
 
 extension Photo {
-    static func createNew(pin: Pin, info: PhotoInfo){
+    static func createNew(pin: Pin, info: PhotoInfo) -> Photo {
         let dataContext = DataContext.persistentContainer.viewContext
         
         let newPhoto = Photo(context: dataContext)
         newPhoto.associatedPin = pin
         newPhoto.id = UUID()
         newPhoto.imageURL = FlickrAPI.imageURL(farm: info.farm, server: info.server, id: info.id, secret: info.secret)
+        // Associate to Pin
+        pin.addToPhoto(newPhoto)
         //  Save Core Data
         do {
             try dataContext.save()
         } catch {
             fatalError("The Photo could not be created: \(error.localizedDescription)")
         }
+        return newPhoto
     }
 }
 
