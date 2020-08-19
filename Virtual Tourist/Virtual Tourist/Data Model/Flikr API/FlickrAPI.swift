@@ -9,6 +9,8 @@
 import Foundation
 
 class FlickrAPI {
+    static let numberPerPage = 25
+
     enum Endpoint : String {
         case baseURL = "https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=cf5e26ab866d8f7e61b97552cf489baa&radius=5&radius_units=km&per_page=25"
         

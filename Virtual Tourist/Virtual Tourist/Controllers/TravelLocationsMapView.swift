@@ -18,7 +18,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
     @IBOutlet var longPressRecognizer: UILongPressGestureRecognizer!
     
     //MARK: Data
-    var dataContext:NSManagedObjectContext!
+    var dataContext:NSManagedObjectContext = DataContext.persistentContainer.viewContext
     var fetchedResultsController:NSFetchedResultsController<Pin>!
     
     //MARK: Variable definitions
@@ -33,8 +33,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
         super.viewDidLoad()
         self.mapView.delegate = self
         // Set Data Context
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        self.dataContext = appDelegate?.persistentContainer.viewContext
         self.longPressRecognizer.delegate = self
         self.mapView.addGestureRecognizer(longPressRecognizer)
         self.setupFetchedResultsController()
@@ -185,7 +183,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, NSFetchedResu
             //Send Pin and View Context to Album View
            let vc = segue.destination as! PhotoAlbumViewController
             vc.pin = sender as! Pin?
-            vc.dataContext = self.dataContext
         }
     }
     
